@@ -24,52 +24,6 @@
 
   <div class="grid grid-cols-1 gap-4 px-4 mt-8 sm:grid-cols-4 sm:px-8">
     <div class="flex items-center bg-white border rounded-sm overflow-hidden shadow">
-      <div class="p-4 bg-green-400">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-12 w-12 text-white"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M3 21h18M4 18h16M6 10v8m4-8v8m4-8v8m4-8v8M4 9.5v-.955a1 1 0 0 1 .458-.84l7-4.52a1 1 0 0 1 1.084 0l7 4.52a1 1 0 0 1 .458.84V9.5a.5.5 0 0 1-.5.5h-15a.5.5 0 0 1-.5-.5Z"
-          />
-        </svg>
-      </div>
-      <div class="px-4 text-gray-700">
-        <h3 class="text-sm tracking-wider">Total Merchants</h3>
-        <p class="text-3xl">{{ totalMembers.toLocaleString() }}</p>
-      </div>
-    </div>
-
-    <div class="flex items-center bg-white border rounded-sm overflow-hidden shadow">
-      <div class="p-4 bg-red-400">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-12 w-12 text-white"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M3 21h18M4 18h16M6 10v8m4-8v8m4-8v8m4-8v8M4 9.5v-.955a1 1 0 0 1 .458-.84l7-4.52a1 1 0 0 1 1.084 0l7 4.52a1 1 0 0 1 .458.84V9.5a.5.5 0 0 1-.5.5h-15a.5.5 0 0 1-.5-.5Z"
-          />
-        </svg>
-      </div>
-      <div class="px-4 text-gray-700">
-        <h3 class="text-sm tracking-wider">Total Merchant Inactive</h3>
-        <p class="text-3xl">{{ totalMerchantInactive.toLocaleString() }}</p>
-      </div>
-    </div>
-
-    <div class="flex items-center bg-white border rounded-sm overflow-hidden shadow">
       <div class="p-4 bg-blue-400">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -116,61 +70,56 @@
         </p>
       </div>
     </div>
-  </div>
 
-  <div class="px-4 py-2 border rounded-md shadow">
-    <div class="px-4 py-2 bg-white border rounded-md overflow-hidden shadow">
-      <h3 class="text-xl text-gray-600 mb-4">Daily Transaction Count</h3>
-
-      <div class="relative h-[300px] w-full">
-        <div
-          ref="dailyLineChartRef"
-          class="h-full w-full transition-opacity duration-300"
-          :class="chartLoading ? 'opacity-0 pointer-events-none' : 'opacity-100'"
-        ></div>
-
-        <div
-          v-if="chartLoading"
-          class="absolute inset-0 flex flex-col items-center justify-center"
+    <div class="flex items-center bg-white border rounded-sm overflow-hidden shadow">
+      <div class="p-4 bg-green-400">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-12 w-12 text-white"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
         >
-          <svg
-            class="animate-spin h-8 w-8 text-indigo-500 mb-2"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-            ></path>
-          </svg>
-          <p class="text-gray-500 text-sm">Loading count transactions...</p>
-        </div>
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M3 21h18M4 18h16M6 10v8m4-8v8m4-8v8m4-8v8M4 9.5v-.955a1 1 0 0 1 .458-.84l7-4.52a1 1 0 0 1 1.084 0l7 4.52a1 1 0 0 1 .458.84V9.5a.5.5 0 0 1-.5.5h-15a.5.5 0 0 1-.5-.5Z"
+          />
+        </svg>
+      </div>
+      <div class="px-4 text-gray-700">
+        <h3 class="text-sm tracking-wider">Total Merchants</h3>
+        <p class="text-3xl">{{ totalMembers.toLocaleString() }}</p>
+      </div>
+    </div>
+
+    <div class="flex items-center bg-white border rounded-sm overflow-hidden shadow">
+      <div class="p-4 bg-red-400">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-12 w-12 text-white"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M3 21h18M4 18h16M6 10v8m4-8v8m4-8v8m4-8v8M4 9.5v-.955a1 1 0 0 1 .458-.84l7-4.52a1 1 0 0 1 1.084 0l7 4.52a1 1 0 0 1 .458.84V9.5a.5.5 0 0 1-.5.5h-15a.5.5 0 0 1-.5-.5Z"
+          />
+        </svg>
+      </div>
+      <div class="px-4 text-gray-700">
+        <h3 class="text-sm tracking-wider">Total Merchant Inactive</h3>
+        <p class="text-3xl">{{ totalMerchantInactive.toLocaleString() }}</p>
       </div>
     </div>
   </div>
 
   <div class="grid grid-cols-1 px-4 gap-4 mt-8 sm:grid-cols-4 sm:px-8">
-    <div class="px-4 py-2 bg-white border rounded-md overflow-hidden shadow gsap-chart-card">
-      <h3 class="text-xl text-gray-600 mb-4">Daily Transactions</h3>
-      <apexchart
-        type="donut"
-        :height="300"
-        :options="sessionsOptions"
-        :series="sessionsSeries"
-      ></apexchart>
-    </div>
-
-    <div class="px-4 py-3 bg-white border rounded-md overflow-hidden shadow gsap-chart-card sm:col-span-3">
+    <div class="px-4 py-3 bg-white border rounded-md overflow-hidden shadow gsap-chart-card sm:col-span-4">
       <div class="flex items-start justify-between mb-3 gap-3">
         <div>
           <h3 class="text-xl text-gray-700">Total Transaction Count & Total Amount</h3>
@@ -225,6 +174,59 @@
         >
           {{ monthlyChartError }}
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 px-4 gap-4 mt-8 sm:grid-cols-4 sm:px-8">
+    <div class="px-4 py-2 bg-white border rounded-md overflow-hidden shadow gsap-chart-card">
+      <h3 class="text-xl text-gray-600 mb-4">Daily Transactions</h3>
+      <apexchart
+        type="donut"
+        :height="300"
+        :options="sessionsOptions"
+        :series="sessionsSeries"
+      ></apexchart>
+    </div>
+
+    <div class="px-4 py-2 border rounded-md shadow sm:col-span-3">
+      <div class="px-4 py-2 bg-white border rounded-md overflow-hidden shadow">
+      <h3 class="text-xl text-gray-600 mb-4">Daily Transaction Count</h3>
+
+      <div class="relative h-[300px] w-full">
+        <div
+          ref="dailyLineChartRef"
+          class="h-full w-full transition-opacity duration-300"
+          :class="chartLoading ? 'opacity-0 pointer-events-none' : 'opacity-100'"
+        ></div>
+
+        <div
+          v-if="chartLoading"
+          class="absolute inset-0 flex flex-col items-center justify-center"
+        >
+          <svg
+            class="animate-spin h-8 w-8 text-indigo-500 mb-2"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            ></path>
+          </svg>
+          <p class="text-gray-500 text-sm">Loading count transactions...</p>
+        </div>
+      </div>
       </div>
     </div>
   </div>
