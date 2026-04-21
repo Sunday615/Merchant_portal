@@ -122,40 +122,40 @@
     <div class="px-4 py-2 bg-white border rounded-md overflow-hidden shadow">
       <h3 class="text-xl text-gray-600 mb-4">Daily Transaction Count</h3>
 
-      <div
-        v-if="chartLoading"
-        class="flex flex-col items-center justify-center h-[300px]"
-      >
-        <svg
-          class="animate-spin h-8 w-8 text-indigo-500 mb-2"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            class="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            stroke-width="4"
-          ></circle>
-          <path
-            class="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-          ></path>
-        </svg>
-        <p class="text-gray-500 text-sm">Loading count transactions...</p>
-      </div>
+      <div class="relative h-[300px] w-full">
+        <div
+          ref="dailyLineChartRef"
+          class="h-full w-full transition-opacity duration-300"
+          :class="chartLoading ? 'opacity-0 pointer-events-none' : 'opacity-100'"
+        ></div>
 
-      <apexchart
-        v-else
-        type="bar"
-        :height="300"
-        :options="pageViewOptions"
-        :series="pageViewSeries"
-      ></apexchart>
+        <div
+          v-if="chartLoading"
+          class="absolute inset-0 flex flex-col items-center justify-center"
+        >
+          <svg
+            class="animate-spin h-8 w-8 text-indigo-500 mb-2"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            ></path>
+          </svg>
+          <p class="text-gray-500 text-sm">Loading count transactions...</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -261,6 +261,7 @@ export default {
     );
 
     const apiUrl = import.meta.env.VITE_API_URL || "/api";
+    const dailyLineChartRef = ref(null);
     const monthlyBarChartRef = ref(null);
     const currentYear = ref(new Date().getFullYear());
     const cachePrefix = "merchant-transaction-dashboard-v1";
@@ -271,6 +272,7 @@ export default {
     const totalsTtlMs = 60 * 1000;
     const memberMerchantTtlMs = 5 * 60 * 1000;
 
+    let dailyLineChart = null;
     let monthlyBarChart = null;
     let monthlyChartTween = null;
     let monthlyRealtimeTimer = null;
@@ -546,9 +548,6 @@ export default {
 
     const getTransferTodayCacheKey = (bankcode) =>
       buildCacheKey("transfer-today-summary", bankcode);
-
-    const getTotalTransferCountCacheKey = (bankcode) =>
-      buildCacheKey("transfer-total-count", bankcode);
 
     const fetchTransferMonthlyRows = async (bankcode, forceRefresh = false) => {
       const cacheKey = getTransferMonthlyCacheKey(bankcode);
@@ -976,7 +975,93 @@ export default {
       );
     };
 
+    const renderDailyLineChart = (categories = [], series = []) => {
+      if (!dailyLineChartRef.value) return;
+
+      if (!dailyLineChart) {
+        dailyLineChart = echarts.init(dailyLineChartRef.value);
+      }
+
+      dailyLineChart.setOption(
+        {
+          color: ["#2563EB", "#10B981"],
+          animationDuration: 800,
+          animationEasing: "cubicOut",
+          grid: {
+            top: 32,
+            left: 24,
+            right: 24,
+            bottom: 24,
+            containLabel: true,
+          },
+          legend: {
+            top: 0,
+            right: 0,
+            itemWidth: 12,
+            itemHeight: 12,
+            textStyle: {
+              color: "#64748B",
+              fontWeight: 600,
+            },
+          },
+          tooltip: {
+            trigger: "axis",
+            confine: true,
+            backgroundColor: "rgba(15, 23, 42, 0.96)",
+            borderWidth: 0,
+            textStyle: { color: "#fff" },
+          },
+          xAxis: {
+            type: "category",
+            boundaryGap: false,
+            data: categories,
+            axisLine: {
+              lineStyle: { color: "#CBD5E1" },
+            },
+            axisTick: { show: false },
+            axisLabel: {
+              color: "#64748B",
+            },
+          },
+          yAxis: {
+            type: "value",
+            splitLine: {
+              lineStyle: { color: "rgba(148, 163, 184, 0.18)" },
+            },
+            axisLabel: {
+              color: "#64748B",
+              formatter: (value) => formatCompact(value),
+            },
+          },
+          series: series.map((item, index) => ({
+            name: item.name,
+            type: "line",
+            smooth: true,
+            symbol: "circle",
+            symbolSize: 7,
+            showSymbol: false,
+            emphasis: {
+              focus: "series",
+              scale: true,
+            },
+            lineStyle: {
+              width: 3,
+            },
+            areaStyle: {
+              opacity: 0.08,
+            },
+            data: Array.isArray(item.data) ? item.data : [],
+            itemStyle: {
+              color: index === 0 ? "#2563EB" : "#10B981",
+            },
+          })),
+        },
+        true
+      );
+    };
+
     const resizeCharts = () => {
+      dailyLineChart?.resize();
       monthlyBarChart?.resize();
     };
 
@@ -1011,6 +1096,8 @@ export default {
       totalTransferTween?.kill();
       totalTransferTween = null;
       window.removeEventListener("resize", resizeCharts);
+      dailyLineChart?.dispose();
+      dailyLineChart = null;
       monthlyBarChart?.dispose();
       monthlyBarChart = null;
     };
@@ -1035,11 +1122,6 @@ export default {
           await nextTick();
           if (requestId !== monthlyChartRequestId) return;
           renderMonthlyBarChart(cached.data);
-          writeCacheEntry(
-            getTotalTransferCountCacheKey(bankcode),
-            getMonthlyTotalCount(cached.data)
-          );
-          setAnimatedTotalTransferCount(getMonthlyTotalCount(cached.data), false);
           monthlyChartInitialized.value = true;
           hasRenderedCachedData = true;
           monthlyChartLoading.value = false;
@@ -1061,12 +1143,6 @@ export default {
         } else {
           renderMonthlyBarChart(rowsToRender);
         }
-        const totalCount = getMonthlyTotalCount(rowsToRender);
-        writeCacheEntry(getTotalTransferCountCacheKey(bankcode), totalCount);
-        setAnimatedTotalTransferCount(
-          totalCount,
-          animate
-        );
         monthlyChartError.value = "";
         monthlyChartInitialized.value = true;
         await waitForChartPaint();
@@ -1103,6 +1179,7 @@ export default {
             ...pageViewOptions.value,
             xaxis: { ...pageViewOptions.value.xaxis, categories: cached.data.categories },
           };
+          renderDailyLineChart(cached.data.categories, cached.data.series);
           chartLoading.value = false;
         }
 
@@ -1155,6 +1232,7 @@ export default {
           ...pageViewOptions.value,
           xaxis: { ...pageViewOptions.value.xaxis, categories: chartData.categories },
         };
+        renderDailyLineChart(chartData.categories, chartData.series);
       } catch (error) {
         console.error("Error fetching daily counts:", error);
       } finally {
@@ -1271,47 +1349,15 @@ export default {
       scheduleMonthlyRealtimeRefresh();
     };
 
-    const fetchTotalTransferTransaction = async (options = {}) => {
-      const { forceRefresh = false, animate = false } = options;
+    const fetchTotalTransferTransaction = async () => {
       transferLoading.value = true;
       try {
-        const bankcode = userBankcode.value;
+        const bankcode = localStorage.getItem("bankcode");
         if (!bankcode) return;
-
-        const totalCacheKey = getTotalTransferCountCacheKey(bankcode);
-        const cachedTotal = getCachedData(totalCacheKey, monthlyScopeTtlMs);
-        const cachedMonthlyRows = getCachedData(
-          getTransferMonthlyCacheKey(bankcode),
-          monthlyScopeTtlMs
-        );
-        const fallbackTotal = (() => {
-          if (cachedTotal.data !== null && cachedTotal.data !== undefined) {
-            return Number(cachedTotal.data) || 0;
-          }
-
-          if (hasMonthlyChartRows(cachedMonthlyRows.data)) {
-            return getMonthlyTotalCount(cachedMonthlyRows.data);
-          }
-
-          return null;
-        })();
-
-        if (fallbackTotal !== null) {
-          writeCacheEntry(totalCacheKey, fallbackTotal);
-          setAnimatedTotalTransferCount(fallbackTotal, false);
-          transferLoading.value = false;
-        }
-
-        const rows = await fetchTransferMonthlyRows(
-          bankcode,
-          forceRefresh ||
-            !cachedMonthlyRows.isFresh ||
-            !hasMonthlyChartRows(cachedMonthlyRows.data)
-        );
-        const count = getMonthlyTotalCount(rows);
-        writeCacheEntry(totalCacheKey, count);
-
-        setAnimatedTotalTransferCount(count, animate && fallbackTotal !== null);
+        const response = await axios.get(`${apiUrl}/transfer/count-today`, {
+          params: { bankcode },
+        });
+        setAnimatedTotalTransferCount(Number(response.data?.count) || 0, false);
       } catch (error) {
         console.error("Error fetching transfer today:", error);
         totalTransferTransaction.value = 0;
@@ -1504,6 +1550,7 @@ export default {
       totalInquiryTransaction,
       totalMerchantInactive,
       totalTransferTransaction,
+      dailyLineChartRef,
       pageViewOptions,
       pageViewSeries,
       sessionsOptions,
