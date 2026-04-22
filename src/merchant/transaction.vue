@@ -1,232 +1,319 @@
 <template>
-  <div class="flex justify-between px-4 mt-4 sm:px-8">
-    <h2 class="text-2xl text-gray-600">Dashboard</h2>
+  <div class="relative min-h-screen overflow-hidden bg-slate-50 pb-10">
+    <div class="pointer-events-none absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-sky-100/80 via-indigo-50/70 to-transparent"></div>
+    <div class="pointer-events-none absolute -left-16 top-20 h-56 w-56 rounded-full bg-sky-200/40 blur-3xl"></div>
+    <div class="pointer-events-none absolute right-0 top-10 h-64 w-64 rounded-full bg-indigo-200/40 blur-3xl"></div>
 
-    <div class="flex items-center space-x-1 text-xs">
-      <a href="#" class="font-bold text-indigo-700">Home</a>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-2 w-2"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M9 5l7 7-7 7"
-        />
-      </svg>
-      <span class="text-gray-600">Dashboard</span>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 gap-4 px-4 mt-8 sm:grid-cols-4 sm:px-8">
-    <div class="flex items-center bg-white border rounded-sm overflow-hidden shadow">
-      <div class="p-4 bg-blue-400">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-12 w-12 text-white"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M3 21h18M4 18h16M6 10v8m4-8v8m4-8v8m4-8v8M4 9.5v-.955a1 1 0 0 1 .458-.84l7-4.52a1 1 0 0 1 1.084 0l7 4.52a1 1 0 0 1 .458.84V9.5a.5.5 0 0 1-.5.5h-15a.5.5 0 0 1-.5-.5Z"
-          />
-        </svg>
-      </div>
-      <div class="px-4 text-gray-700">
-        <h3 class="text-sm tracking-wider">Total transaction inquiry (LMPS)</h3>
-        <p class="text-3xl">{{ totalInquiryTransaction.toLocaleString() }}</p>
-      </div>
-    </div>
-
-    <div class="flex items-center bg-white border rounded-sm overflow-hidden shadow">
-      <div class="p-4 bg-indigo-400">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-12 w-12 text-white"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M3 21h18M4 18h16M6 10v8m4-8v8m4-8v8m4-8v8M4 9.5v-.955a1 1 0 0 1 .458-.84l7-4.52a1 1 0 0 1 1.084 0l7 4.52a1 1 0 0 1 .458.84V9.5a.5.5 0 0 1-.5.5h-15a.5.5 0 0 1-.5-.5Z"
-          />
-        </svg>
-      </div>
-      <div class="px-4 text-gray-700">
-        <h3 class="text-sm tracking-wider">Total transaction transfer (LMPS)</h3>
-        <p class="text-3xl">
-          {{ transferLoading ? "Loading..." : totalTransferTransaction.toLocaleString() }}
-        </p>
-      </div>
-    </div>
-
-    <div class="flex items-center bg-white border rounded-sm overflow-hidden shadow">
-      <div class="p-4 bg-green-400">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-12 w-12 text-white"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M3 21h18M4 18h16M6 10v8m4-8v8m4-8v8m4-8v8M4 9.5v-.955a1 1 0 0 1 .458-.84l7-4.52a1 1 0 0 1 1.084 0l7 4.52a1 1 0 0 1 .458.84V9.5a.5.5 0 0 1-.5.5h-15a.5.5 0 0 1-.5-.5Z"
-          />
-        </svg>
-      </div>
-      <div class="px-4 text-gray-700">
-        <h3 class="text-sm tracking-wider">Total Merchants</h3>
-        <p class="text-3xl">{{ totalMembers.toLocaleString() }}</p>
-      </div>
-    </div>
-
-    <div class="flex items-center bg-white border rounded-sm overflow-hidden shadow">
-      <div class="p-4 bg-red-400">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-12 w-12 text-white"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M3 21h18M4 18h16M6 10v8m4-8v8m4-8v8m4-8v8M4 9.5v-.955a1 1 0 0 1 .458-.84l7-4.52a1 1 0 0 1 1.084 0l7 4.52a1 1 0 0 1 .458.84V9.5a.5.5 0 0 1-.5.5h-15a.5.5 0 0 1-.5-.5Z"
-          />
-        </svg>
-      </div>
-      <div class="px-4 text-gray-700">
-        <h3 class="text-sm tracking-wider">Total Merchant Inactive</h3>
-        <p class="text-3xl">{{ totalMerchantInactive.toLocaleString() }}</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 px-4 gap-4 mt-8 sm:grid-cols-4 sm:px-8">
-    <div class="px-4 py-3 bg-white border rounded-md overflow-hidden shadow gsap-chart-card sm:col-span-4">
-      <div class="flex items-start justify-between mb-3 gap-3">
-        <div>
-          <h3 class="text-xl text-gray-700">Total Transaction Count & Total Amount</h3>
-          <p class="text-sm text-gray-500">
-            {{ userBankcode || "No bankcode" }} · {{ currentYear }}
-          </p>
-        </div>
-      </div>
-      <div class="relative h-[320px] w-full overflow-hidden rounded-md">
-        <div
-          ref="monthlyBarChartRef"
-          class="h-full w-full transition-opacity duration-300"
-          :class="monthlyChartInitialized ? 'opacity-100' : 'opacity-0 pointer-events-none'"
-        ></div>
-        <div
-          v-if="monthlyChartLoading"
-          class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/90 text-sm text-gray-500 backdrop-blur-[1px]"
-        >
-          <div class="mb-5 flex items-end gap-2">
-            <span class="h-12 w-3 rounded-full bg-blue-200 animate-pulse"></span>
-            <span class="h-20 w-3 rounded-full bg-blue-500/80 animate-pulse [animation-delay:120ms]"></span>
-            <span class="h-14 w-3 rounded-full bg-amber-200 animate-pulse [animation-delay:220ms]"></span>
-            <span class="h-24 w-3 rounded-full bg-amber-500/80 animate-pulse [animation-delay:320ms]"></span>
-            <span class="h-10 w-3 rounded-full bg-slate-200 animate-pulse [animation-delay:420ms]"></span>
+    <div class="relative px-4 pt-6 sm:px-8">
+      <div class="flex flex-col gap-4 rounded-[28px] border border-white/70 bg-white/75 px-5 py-5 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur sm:flex-row sm:items-end sm:justify-between sm:px-6">
+        <div class="space-y-3">
+          <div class="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-sky-700">
+            Merchant Analytics
           </div>
+          <div>
+            <h2 class="text-3xl font-semibold tracking-tight text-slate-900">Transaction Dashboard</h2>
+            <p class="mt-2 max-w-2xl text-sm text-slate-500">
+              Overview of inquiry, transfer, and merchant activity across the portal.
+            </p>
+          </div>
+        </div>
+
+        <div class="inline-flex items-center gap-2 self-start rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-medium text-slate-500 shadow-sm sm:self-auto">
+          <a href="#" class="font-semibold text-sky-700 transition-colors hover:text-sky-800">Home</a>
           <svg
-            class="mb-2 h-8 w-8 animate-spin text-indigo-500"
             xmlns="http://www.w3.org/2000/svg"
+            class="h-3.5 w-3.5 text-slate-300"
             fill="none"
             viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
             <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-            ></path>
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
           </svg>
-          <p class="font-medium text-gray-600">Loading total count & amount...</p>
-          <p class="mt-1 text-xs text-gray-400">Preparing monthly transfer chart</p>
-        </div>
-        <div
-          v-else-if="!monthlyChartInitialized && monthlyChartError"
-          class="absolute inset-0 z-10 flex items-center justify-center bg-white/90 px-6 text-center text-sm text-red-500"
-        >
-          {{ monthlyChartError }}
+          <span class="text-slate-600">Dashboard</span>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="grid grid-cols-1 px-4 gap-4 mt-8 sm:grid-cols-4 sm:px-8">
-    <div class="px-4 py-2 bg-white border rounded-md overflow-hidden shadow gsap-chart-card">
-      <h3 class="text-xl text-gray-600 mb-4">Daily Transactions</h3>
-      <apexchart
-        type="donut"
-        :height="300"
-        :options="sessionsOptions"
-        :series="sessionsSeries"
-      ></apexchart>
-    </div>
+    <div class="relative grid grid-cols-1 gap-5 px-4 mt-6 sm:grid-cols-2 xl:grid-cols-4 sm:px-8">
+      <div class="group relative overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/90 p-5 shadow-[0_14px_34px_rgba(15,23,42,0.08)] ring-1 ring-white/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(15,23,42,0.12)]">
+        <div class="pointer-events-none absolute right-0 top-0 h-24 w-24 rounded-full bg-sky-100/70 blur-2xl"></div>
+        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-400"></div>
 
-    <div class="px-4 py-2 border rounded-md shadow sm:col-span-3">
-      <div class="px-4 py-2 bg-white border rounded-md overflow-hidden shadow">
-      <h3 class="text-xl text-gray-600 mb-4">Daily Transaction Count</h3>
+        <div class="relative flex h-full flex-col justify-between gap-6">
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-3">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-sky-700/80">
+                LMPS Inquiry
+              </p>
+              <h3 class="max-w-[15rem] text-sm font-medium leading-6 text-slate-500">
+                Total transaction inquiry (LMPS)
+              </h3>
+            </div>
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500 via-blue-500 to-cyan-500 shadow-[0_12px_28px_rgba(37,99,235,0.28)] ring-1 ring-white/70">
+              <img
+                src="/fontawesome/arrow-down-box-fill.svg"
+                alt="Transaction inquiry icon"
+                class="h-7 w-7 invert brightness-0"
+              />
+            </div>
+          </div>
 
-      <div class="relative h-[300px] w-full">
-        <div
-          ref="dailyLineChartRef"
-          class="h-full w-full transition-opacity duration-300"
-          :class="chartLoading ? 'opacity-0 pointer-events-none' : 'opacity-100'"
-        ></div>
-
-        <div
-          v-if="chartLoading"
-          class="absolute inset-0 flex flex-col items-center justify-center"
-        >
-          <svg
-            class="animate-spin h-8 w-8 text-indigo-500 mb-2"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-            ></path>
-          </svg>
-          <p class="text-gray-500 text-sm">Loading count transactions...</p>
+          <div class="flex items-end justify-between gap-4">
+            <p class="text-3xl font-semibold tracking-tight text-slate-900 sm:text-[2rem]">
+              {{ totalInquiryTransaction.toLocaleString() }}
+            </p>
+            <span class="rounded-full bg-sky-50 px-3 py-1 text-[11px] font-semibold text-sky-700">
+              Inquiry
+            </span>
+          </div>
         </div>
       </div>
+
+      <div class="group relative overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/90 p-5 shadow-[0_14px_34px_rgba(15,23,42,0.08)] ring-1 ring-white/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(15,23,42,0.12)]">
+        <div class="pointer-events-none absolute right-0 top-0 h-24 w-24 rounded-full bg-indigo-100/70 blur-2xl"></div>
+        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-400 via-violet-500 to-blue-500"></div>
+
+        <div class="relative flex h-full flex-col justify-between gap-6">
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-3">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-indigo-700/80">
+                LMPS Transfer
+              </p>
+              <h3 class="max-w-[15rem] text-sm font-medium leading-6 text-slate-500">
+                Total transaction transfer (LMPS)
+              </h3>
+            </div>
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 via-violet-500 to-blue-600 shadow-[0_12px_28px_rgba(79,70,229,0.28)] ring-1 ring-white/70">
+              <img
+                src="/fontawesome/money-bill-transfer-solid-full.svg"
+                alt="Transaction transfer icon"
+                class="h-7 w-7 invert brightness-0"
+              />
+            </div>
+          </div>
+
+          <div class="flex items-end justify-between gap-4">
+            <p class="text-3xl font-semibold tracking-tight text-slate-900 sm:text-[2rem]">
+              {{ transferLoading ? "Loading..." : totalTransferTransaction.toLocaleString() }}
+            </p>
+            <span class="rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-semibold text-indigo-700">
+              Transfer
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="group relative overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/90 p-5 shadow-[0_14px_34px_rgba(15,23,42,0.08)] ring-1 ring-white/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(15,23,42,0.12)]">
+        <div class="pointer-events-none absolute right-0 top-0 h-24 w-24 rounded-full bg-emerald-100/70 blur-2xl"></div>
+        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-500 to-green-500"></div>
+
+        <div class="relative flex h-full flex-col justify-between gap-6">
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-3">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-emerald-700/80">
+                Merchant Base
+              </p>
+              <h3 class="max-w-[15rem] text-sm font-medium leading-6 text-slate-500">
+                Total Merchants
+              </h3>
+            </div>
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-500 to-green-500 shadow-[0_12px_28px_rgba(16,185,129,0.25)] ring-1 ring-white/70">
+              <img
+                src="/fontawesome/store-solid-full.svg"
+                alt="Store icon"
+                class="h-7 w-7 invert brightness-0"
+              />
+            </div>
+          </div>
+
+          <div class="flex items-end justify-between gap-4">
+            <p class="text-3xl font-semibold tracking-tight text-slate-900 sm:text-[2rem]">
+              {{ totalMembers.toLocaleString() }}
+            </p>
+            <span class="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-700">
+              Merchants
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="group relative overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/90 p-5 shadow-[0_14px_34px_rgba(15,23,42,0.08)] ring-1 ring-white/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(15,23,42,0.12)]">
+        <div class="pointer-events-none absolute right-0 top-0 h-24 w-24 rounded-full bg-rose-100/70 blur-2xl"></div>
+        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-rose-400 via-orange-400 to-red-500"></div>
+
+        <div class="relative flex h-full flex-col justify-between gap-6">
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-3">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-rose-700/80">
+                Merchant Status
+              </p>
+              <h3 class="max-w-[15rem] text-sm font-medium leading-6 text-slate-500">
+                Total Merchant Inactive
+              </h3>
+            </div>
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-500 via-orange-400 to-red-500 shadow-[0_12px_28px_rgba(244,63,94,0.24)] ring-1 ring-white/70">
+              <img
+                src="/fontawesome/store-slash-solid-full.svg"
+                alt="Store inactive icon"
+                class="h-7 w-7 invert brightness-0"
+              />
+            </div>
+          </div>
+
+          <div class="flex items-end justify-between gap-4">
+            <p class="text-3xl font-semibold tracking-tight text-slate-900 sm:text-[2rem]">
+              {{ totalMerchantInactive.toLocaleString() }}
+            </p>
+            <span class="rounded-full bg-rose-50 px-3 py-1 text-[11px] font-semibold text-rose-700">
+              Inactive
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative grid grid-cols-1 gap-5 px-4 mt-6 lg:grid-cols-4 sm:px-8">
+      <div class="relative overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/90 px-5 py-5 shadow-[0_16px_40px_rgba(15,23,42,0.08)] ring-1 ring-white/60 gsap-chart-card sm:px-6 sm:py-6 lg:col-span-4">
+        <div class="pointer-events-none absolute right-12 top-0 h-36 w-36 rounded-full bg-sky-100/70 blur-3xl"></div>
+
+        <div class="relative flex items-start justify-between gap-3">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">
+              Yearly Overview
+            </p>
+            <h3 class="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
+              Total Transaction Count & Total Amount
+            </h3>
+            <p class="mt-2 text-sm text-slate-500">
+              {{ userBankcode || "No bankcode" }} · {{ currentYear }}
+            </p>
+          </div>
+        </div>
+
+        <div class="relative mt-5 h-[320px] w-full overflow-hidden rounded-[22px] border border-slate-200/70 bg-slate-50/80 p-2">
+          <div
+            ref="monthlyBarChartRef"
+            class="h-full w-full transition-opacity duration-300"
+            :class="monthlyChartInitialized ? 'opacity-100' : 'opacity-0 pointer-events-none'"
+          ></div>
+          <div
+            v-if="monthlyChartLoading"
+            class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/85 text-sm text-slate-500 backdrop-blur-sm"
+          >
+            <div class="mb-5 flex items-end gap-2">
+              <span class="h-12 w-3 rounded-full bg-blue-200 animate-pulse"></span>
+              <span class="h-20 w-3 rounded-full bg-blue-500/80 animate-pulse [animation-delay:120ms]"></span>
+              <span class="h-14 w-3 rounded-full bg-amber-200 animate-pulse [animation-delay:220ms]"></span>
+              <span class="h-24 w-3 rounded-full bg-amber-500/80 animate-pulse [animation-delay:320ms]"></span>
+              <span class="h-10 w-3 rounded-full bg-slate-200 animate-pulse [animation-delay:420ms]"></span>
+            </div>
+            <svg
+              class="mb-2 h-8 w-8 animate-spin text-indigo-500"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              ></path>
+            </svg>
+            <p class="font-medium text-slate-600">Loading total count & amount...</p>
+            <p class="mt-1 text-xs text-slate-400">Preparing monthly transfer chart</p>
+          </div>
+          <div
+            v-else-if="!monthlyChartInitialized && monthlyChartError"
+            class="absolute inset-0 z-10 flex items-center justify-center bg-white/85 px-6 text-center text-sm text-red-500 backdrop-blur-sm"
+          >
+            {{ monthlyChartError }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative grid grid-cols-1 gap-5 px-4 mt-6 lg:grid-cols-4 sm:px-8">
+      <div class="relative overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/90 px-5 py-5 shadow-[0_16px_40px_rgba(15,23,42,0.08)] ring-1 ring-white/60 gsap-chart-card sm:px-6 sm:py-6">
+        <div class="pointer-events-none absolute right-0 top-0 h-32 w-32 rounded-full bg-indigo-100/70 blur-3xl"></div>
+
+        <div class="relative">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">
+            Daily Mix
+          </p>
+          <h3 class="mt-2 text-xl font-semibold tracking-tight text-slate-900">
+            Daily Transactions
+          </h3>
+        </div>
+
+        <div class="relative mt-5 overflow-hidden rounded-[22px] border border-slate-200/70 bg-slate-50/80 p-2">
+          <apexchart
+            type="donut"
+            :height="300"
+            :options="sessionsOptions"
+            :series="sessionsSeries"
+          ></apexchart>
+        </div>
+      </div>
+
+      <div class="relative overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/90 px-5 py-5 shadow-[0_16px_40px_rgba(15,23,42,0.08)] ring-1 ring-white/60 sm:px-6 sm:py-6 lg:col-span-3">
+        <div class="pointer-events-none absolute right-12 top-0 h-36 w-36 rounded-full bg-emerald-100/60 blur-3xl"></div>
+
+        <div class="relative">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">
+            Daily Trend
+          </p>
+          <h3 class="mt-2 text-xl font-semibold tracking-tight text-slate-900">
+            Daily Transaction Count
+          </h3>
+        </div>
+
+        <div class="relative mt-5 h-[300px] w-full overflow-hidden rounded-[22px] border border-slate-200/70 bg-slate-50/80 p-2">
+          <div
+            ref="dailyLineChartRef"
+            class="h-full w-full transition-opacity duration-300"
+            :class="chartLoading ? 'opacity-0 pointer-events-none' : 'opacity-100'"
+          ></div>
+
+          <div
+            v-if="chartLoading"
+            class="absolute inset-0 flex flex-col items-center justify-center bg-white/85 backdrop-blur-sm"
+          >
+            <svg
+              class="mb-2 h-8 w-8 animate-spin text-indigo-500"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              ></path>
+            </svg>
+            <p class="text-sm text-slate-500">Loading count transactions...</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
