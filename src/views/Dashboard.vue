@@ -1,107 +1,233 @@
 <template>
-  <div class="flex justify-between px-4 mt-4 sm:px-8">
-    <h2 class="text-2xl text-gray-600">Dashboard</h2>
+  <div class="relative min-h-screen overflow-hidden bg-slate-50 pb-10">
+    <div class="pointer-events-none absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-sky-100/80 via-indigo-50/70 to-transparent"></div>
+    <div class="pointer-events-none absolute -left-16 top-20 h-56 w-56 rounded-full bg-sky-200/40 blur-3xl"></div>
+    <div class="pointer-events-none absolute right-0 top-10 h-64 w-64 rounded-full bg-indigo-200/40 blur-3xl"></div>
 
-    <div class="flex items-center space-x-1 text-xs">
-      <a href="#" class="font-bold text-indigo-700">Home</a>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-2 w-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-      </svg>
-      <span class="text-gray-600">Dashboard</span>
-    </div>
-  </div>
+    <div class="relative px-4 pt-6 sm:px-8">
+      <div class="flex flex-col gap-4 rounded-[28px] border border-white/70 bg-white/75 px-5 py-5 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur sm:flex-row sm:items-end sm:justify-between sm:px-6">
+        <div class="space-y-3">
+          <div class="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-sky-700">
+            Merchant Analytics
+          </div>
+          <div>
+            <h2 class="text-3xl font-semibold tracking-tight text-slate-900">Dashboard Overview</h2>
+        
+          </div>
+        </div>
 
-  <div class="grid grid-cols-1 gap-4 px-4 mt-8 sm:grid-cols-4 sm:px-8">
-    <div class="flex items-center bg-white border rounded-sm overflow-hidden shadow">
-      <div class="p-4 bg-green-400">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M3 21h18M4 18h16M6 10v8m4-8v8m4-8v8m4-8v8M4 9.5v-.955a1 1 0 0 1 .458-.84l7-4.52a1 1 0 0 1 1.084 0l7 4.52a1 1 0 0 1 .458.84V9.5a.5.5 0 0 1-.5.5h-15a.5.5 0 0 1-.5-.5Z" />
-        </svg>
-      </div>
-      <div class="px-4 text-gray-700">
-        <h3 class="text-sm tracking-wider">Total Merchants</h3>
-        <p class="text-3xl">{{ totalMembers.toLocaleString() }}</p>
-      </div>
-    </div>
-
-    <div class="flex items-center bg-white border rounded-sm overflow-hidden shadow">
-      <div class="p-4 bg-blue-400">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M3 21h18M4 18h16M6 10v8m4-8v8m4-8v8m4-8v8M4 9.5v-.955a1 1 0 0 1 .458-.84l7-4.52a1 1 0 0 1 1.084 0l7 4.52a1 1 0 0 1 .458.84V9.5a.5.5 0 0 1-.5.5h-15a.5.5 0 0 1-.5-.5Z" />
-        </svg>
-      </div>
-      <div class="px-4 text-gray-700">
-        <h3 class="text-sm tracking-wider">Total Merchants (Real merchants)</h3>
-        <p class="text-3xl">{{ totalMerchantActive.toLocaleString() }}</p>
+        <div class="inline-flex items-center gap-2 self-start rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-medium text-slate-500 shadow-sm sm:self-auto">
+          <a href="#" class="font-semibold text-sky-700 transition-colors hover:text-sky-800">Home</a>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+          <span class="text-slate-600">Dashboard</span>
+        </div>
       </div>
     </div>
 
-    <div class="flex items-center bg-white border rounded-sm overflow-hidden shadow">
-      <div class="p-4 bg-red-400">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M3 21h18M4 18h16M6 10v8m4-8v8m4-8v8m4-8v8M4 9.5v-.955a1 1 0 0 1 .458-.84l7-4.52a1 1 0 0 1 1.084 0l7 4.52a1 1 0 0 1 .458.84V9.5a.5.5 0 0 1-.5.5h-15a.5.5 0 0 1-.5-.5Z" />
-        </svg>
+    <div class="relative grid grid-cols-1 gap-5 px-4 mt-6 sm:grid-cols-2 xl:grid-cols-4 sm:px-8">
+      <div class="group relative overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/90 p-5 shadow-[0_14px_34px_rgba(15,23,42,0.08)] ring-1 ring-white/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(15,23,42,0.12)]">
+        <div class="pointer-events-none absolute right-0 top-0 h-24 w-24 rounded-full bg-emerald-100/70 blur-2xl"></div>
+        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-500 to-green-500"></div>
+
+        <div class="relative flex h-full flex-col justify-between gap-6">
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-3">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-emerald-700/80">
+                Merchant Base
+              </p>
+              <h3 class="max-w-[15rem] text-sm font-medium leading-6 text-slate-500">
+                Total Merchants
+              </h3>
+            </div>
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-500 to-green-500 shadow-[0_12px_28px_rgba(16,185,129,0.25)] ring-1 ring-white/70">
+              <img
+                src="/fontawesome/store-solid-full.svg"
+                alt="Store icon"
+                class="h-7 w-7 invert brightness-0"
+              />
+            </div>
+          </div>
+
+          <div class="flex items-end justify-between gap-4">
+            <p class="text-3xl font-semibold tracking-tight text-slate-900 sm:text-[2rem]">
+              {{ totalMembers.toLocaleString() }}
+            </p>
+            <span class="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-700">
+              Merchants
+            </span>
+          </div>
+        </div>
       </div>
-      <div class="px-4 text-gray-700">
-        <h3 class="text-sm tracking-wider">Total Merchant Inactive</h3>
-        <p class="text-3xl">{{ totalMerchantInactive.toLocaleString() }}</p>
+
+      <div class="group relative overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/90 p-5 shadow-[0_14px_34px_rgba(15,23,42,0.08)] ring-1 ring-white/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(15,23,42,0.12)]">
+        <div class="pointer-events-none absolute right-0 top-0 h-24 w-24 rounded-full bg-sky-100/70 blur-2xl"></div>
+        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-400"></div>
+
+        <div class="relative flex h-full flex-col justify-between gap-6">
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-3">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-sky-700/80">
+                Active Merchants
+              </p>
+              <h3 class="max-w-[15rem] text-sm font-medium leading-6 text-slate-500">
+                Total Merchants (Real merchants)
+              </h3>
+            </div>
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500 via-blue-500 to-cyan-500 shadow-[0_12px_28px_rgba(37,99,235,0.28)] ring-1 ring-white/70">
+              <img
+                src="/fontawesome/store-solid-full.svg"
+                alt="Active merchant icon"
+                class="h-7 w-7 invert brightness-0"
+              />
+            </div>
+          </div>
+
+          <div class="flex items-end justify-between gap-4">
+            <p class="text-3xl font-semibold tracking-tight text-slate-900 sm:text-[2rem]">
+              {{ totalMerchantActive.toLocaleString() }}
+            </p>
+            <span class="rounded-full bg-sky-50 px-3 py-1 text-[11px] font-semibold text-sky-700">
+              Active
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="group relative overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/90 p-5 shadow-[0_14px_34px_rgba(15,23,42,0.08)] ring-1 ring-white/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(15,23,42,0.12)]">
+        <div class="pointer-events-none absolute right-0 top-0 h-24 w-24 rounded-full bg-rose-100/70 blur-2xl"></div>
+        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-rose-400 via-orange-400 to-red-500"></div>
+
+        <div class="relative flex h-full flex-col justify-between gap-6">
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-3">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-rose-700/80">
+                Merchant Status
+              </p>
+              <h3 class="max-w-[15rem] text-sm font-medium leading-6 text-slate-500">
+                Total Merchant Inactive
+              </h3>
+            </div>
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-500 via-orange-400 to-red-500 shadow-[0_12px_28px_rgba(244,63,94,0.24)] ring-1 ring-white/70">
+              <img
+                src="/fontawesome/store-slash-solid-full.svg"
+                alt="Store inactive icon"
+                class="h-7 w-7 invert brightness-0"
+              />
+            </div>
+          </div>
+
+          <div class="flex items-end justify-between gap-4">
+            <p class="text-3xl font-semibold tracking-tight text-slate-900 sm:text-[2rem]">
+              {{ totalMerchantInactive.toLocaleString() }}
+            </p>
+            <span class="rounded-full bg-rose-50 px-3 py-1 text-[11px] font-semibold text-rose-700">
+              Inactive
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="group relative overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/90 p-5 shadow-[0_14px_34px_rgba(15,23,42,0.08)] ring-1 ring-white/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(15,23,42,0.12)]">
+        <div class="pointer-events-none absolute right-0 top-0 h-24 w-24 rounded-full bg-indigo-100/70 blur-2xl"></div>
+        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-400 via-violet-500 to-blue-500"></div>
+
+        <div class="relative flex h-full flex-col justify-between gap-6">
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-3">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-indigo-700/80">
+                Cross-Border
+              </p>
+              <h3 class="max-w-[15rem] text-sm font-medium leading-6 text-slate-500">
+                Total Merchant Receive Crossborder
+              </h3>
+            </div>
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 via-violet-500 to-blue-600 shadow-[0_12px_28px_rgba(79,70,229,0.28)] ring-1 ring-white/70">
+              <img
+                src="/fontawesome/earth-asia-solid-full.svg"
+                alt="Crossborder icon"
+                class="h-7 w-7 invert brightness-0"
+              />
+            </div>
+          </div>
+
+          <div class="flex items-end justify-between gap-4">
+            <p class="text-3xl font-semibold tracking-tight text-slate-900 sm:text-[2rem]">
+              {{ totalMerchantReceiveCrossborder.toLocaleString() }}
+            </p>
+            <span class="rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-semibold text-indigo-700">
+              Crossborder
+            </span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="flex items-center bg-white border rounded-sm overflow-hidden shadow">
-      <div class="p-4 bg-indigo-400">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M3 21h18M4 18h16M6 10v8m4-8v8m4-8v8m4-8v8M4 9.5v-.955a1 1 0 0 1 .458-.84l7-4.52a1 1 0 0 1 1.084 0l7 4.52a1 1 0 0 1 .458.84V9.5a.5.5 0 0 1-.5.5h-15a.5.5 0 0 1-.5-.5Z" />
-        </svg>
+    <div class="relative grid grid-cols-1 gap-5 px-4 mt-6 lg:grid-cols-3 sm:px-8">
+      <div class="relative overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/90 px-5 py-5 shadow-[0_16px_40px_rgba(15,23,42,0.08)] ring-1 ring-white/60 sm:px-6 sm:py-6">
+        <div class="pointer-events-none absolute right-0 top-0 h-32 w-32 rounded-full bg-sky-100/70 blur-3xl"></div>
+
+        <div class="relative">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">
+            Trend
+          </p>
+          <h3 class="mt-2 text-xl font-semibold tracking-tight text-slate-900">
+            Monthly Count
+          </h3>
+        </div>
+
+        <div class="relative mt-5 overflow-hidden rounded-[22px] border border-slate-200/70 bg-slate-50/80 p-2">
+          <apexchart type="area" :height="300" :options="pageViewOptions" :series="pageViewSeries"></apexchart>
+        </div>
       </div>
-      <div class="px-4 text-gray-700">
-        <h3 class="text-sm tracking-wider">Total Merchant Receive Crossborder</h3>
-        <p class="text-3xl">{{ totalMerchantReceiveCrossborder.toLocaleString() }}</p>
+
+      <div class="relative overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/90 px-5 py-5 shadow-[0_16px_40px_rgba(15,23,42,0.08)] ring-1 ring-white/60 sm:px-6 sm:py-6">
+        <div class="pointer-events-none absolute right-0 top-0 h-32 w-32 rounded-full bg-indigo-100/70 blur-3xl"></div>
+
+        <div class="relative">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">
+            Distribution
+          </p>
+          <h3 class="mt-2 text-xl font-semibold tracking-tight text-slate-900">
+            Member Merchants
+          </h3>
+        </div>
+
+        <div class="relative mt-5 overflow-hidden rounded-[22px] border border-slate-200/70 bg-slate-50/80 p-2">
+          <apexchart type="donut" :height="300" :options="sessionsOptions" :series="sessionsSeries"></apexchart>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <div class="grid grid-cols-1 px-4 gap-4 mt-8 sm:grid-cols-3 sm:px-8">
-    <div class="px-4 py-2 bg-white border rounded-md overflow-hidden shadow">
-      <h3 class="text-xl text-gray-600 mb-4">Monthly Count</h3>
-      <apexchart type="area" :height="300" :options="pageViewOptions" :series="pageViewSeries"></apexchart>
-    </div>
+      <div class="relative overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/90 px-5 py-5 shadow-[0_16px_40px_rgba(15,23,42,0.08)] ring-1 ring-white/60 sm:px-6 sm:py-6">
+        <div class="pointer-events-none absolute right-10 top-0 h-32 w-32 rounded-full bg-emerald-100/70 blur-3xl"></div>
 
-    <div class="px-4 py-2 bg-white border rounded-md overflow-hidden shadow">
-      <h3 class="text-xl text-gray-600 mb-4">Member Merchants</h3>
-      <apexchart type="donut" :height="300" :options="sessionsOptions" :series="sessionsSeries"></apexchart>
-    </div>
+        <div class="relative">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">
+            Province Overview
+          </p>
+          <h3 class="mt-2 text-xl font-semibold tracking-tight text-slate-900">
+            Merchants
+          </h3>
+        </div>
 
-    <div class="px-4 py-2 bg-white border rounded-md shadow">
-      <h3 class="text-xl text-gray-600 mb-2">Merchants</h3>
-
-      <div class="flex flex-col">
-        <div class="align-middle inline-block min-w-full">
-          <!-- 🔹 set max height for ~10 rows and enable scroll -->
-          <div class="overflow-y-auto border-0 max-h-80">
-            <table class="table-auto min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50 sticky top-0 z-10">
+        <div class="relative mt-5 overflow-hidden rounded-[22px] border border-slate-200/70 bg-slate-50/80 p-2">
+          <div class="overflow-y-auto max-h-80 rounded-[18px] bg-white">
+            <table class="table-auto min-w-full divide-y divide-slate-200">
+              <thead class="sticky top-0 z-10 bg-slate-50">
                 <tr>
-                  <th scope="col" class="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">
                     Province
                   </th>
-                  <th scope="col" class="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" class="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">
                     Count
                   </th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-gray-200 text-sm text-gray-500">
-                <tr v-for="(item, index) in provinces" :key="index">
-                  <td class="py-1">{{ item.Province }}</td>
-                  <td class="py-1 text-sm text-gray-500">{{ item.count }}</td>
+              <tbody class="divide-y divide-slate-100 text-sm text-slate-500">
+                <tr v-for="(item, index) in provinces" :key="index" class="transition-colors hover:bg-slate-50/80">
+                  <td class="px-4 py-3 font-medium text-slate-600">{{ item.Province }}</td>
+                  <td class="px-4 py-3">{{ item.count }}</td>
                 </tr>
               </tbody>
             </table>
@@ -109,12 +235,7 @@
         </div>
       </div>
     </div>
-
   </div>
-  <!--
- 
--->
-
 </template>
 
 <script>

@@ -10,7 +10,7 @@ export default defineConfig({
     },
   },
   define: {
-    'import.meta.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL || 'http:///175.11.0.122:5000/api'),
+    'import.meta.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL || 'http://175.17.4.20:5000/api'),
   },
   build: {
     outDir: 'dist',

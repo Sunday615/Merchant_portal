@@ -1,5 +1,5 @@
 <template>
-  <header class="flex justify-between bg-white border-b-2 px-4 sm:justify-end sm:px-6">
+  <header class="relative z-50 flex justify-between bg-white border-b-2 px-4 sm:justify-end sm:px-6">
     <button class="sm:hidden">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -11,7 +11,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
       </svg>
     </button>
-    <Menu as="div" class="relative">
+    <Menu as="div" class="relative z-50">
       <MenuButton class="flex items-center space-x-2 px-2 py-3 text-sm hover:bg-gray-200 focus:outline-none">
         <img
           class="h-8 w-8 rounded-full"
@@ -43,6 +43,7 @@
             absolute
             right-0
             w-48
+            z-50
             shadow-lg
             py-1
             bg-white
