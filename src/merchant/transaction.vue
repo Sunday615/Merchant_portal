@@ -48,10 +48,10 @@
           <div class="flex items-start justify-between gap-4">
             <div class="space-y-3">
               <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-sky-700/80">
-                LMPS Inquiry
+                LMPS Transaction Count
               </p>
               <h3 class="max-w-[15rem] text-sm font-medium leading-6 text-slate-500">
-                Total transaction inquiry (LMPS)
+                Total transaction Count (LMPS)
               </h3>
             </div>
             <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500 via-blue-500 to-cyan-500 shadow-[0_12px_28px_rgba(37,99,235,0.28)] ring-1 ring-white/70">
@@ -65,10 +65,10 @@
 
           <div class="flex items-end justify-between gap-4">
             <p class="text-3xl font-semibold tracking-tight text-slate-900 sm:text-[2rem]">
-              {{ totalInquiryTransaction.toLocaleString() }}
+              {{ formatCount(totalInquiryTransaction) }}
             </p>
             <span class="rounded-full bg-sky-50 px-3 py-1 text-[11px] font-semibold text-sky-700">
-              Inquiry
+              Count
             </span>
           </div>
         </div>
@@ -82,10 +82,10 @@
           <div class="flex items-start justify-between gap-4">
             <div class="space-y-3">
               <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-indigo-700/80">
-                LMPS Transfer
+                LMPS Amount
               </p>
               <h3 class="max-w-[15rem] text-sm font-medium leading-6 text-slate-500">
-                Total transaction transfer (LMPS)
+                Total transaction amount (LMPS)
               </h3>
             </div>
             <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 via-violet-500 to-blue-600 shadow-[0_12px_28px_rgba(79,70,229,0.28)] ring-1 ring-white/70">
@@ -98,11 +98,11 @@
           </div>
 
           <div class="flex items-end justify-between gap-4">
-            <p class="text-3xl font-semibold tracking-tight text-slate-900 sm:text-[2rem]">
-              {{ transferLoading ? "Loading..." : totalTransferTransaction.toLocaleString() }}
+            <p class="text-3xl font-semibold tracking-tight text-slate-900 sm:text-[1.5rem]">
+              {{ transferLoading ? "Loading..." : formatAmount(totalTransferTransaction) }}
             </p>
             <span class="rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-semibold text-indigo-700">
-              Transfer
+              Amount
             </span>
           </div>
         </div>
@@ -181,17 +181,56 @@
       <div class="relative overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/90 px-5 py-5 shadow-[0_16px_40px_rgba(15,23,42,0.08)] ring-1 ring-white/60 gsap-chart-card sm:px-6 sm:py-6 lg:col-span-4">
         <div class="pointer-events-none absolute right-12 top-0 h-36 w-36 rounded-full bg-sky-100/70 blur-3xl"></div>
 
-        <div class="relative flex items-start justify-between gap-3">
+        <div class="relative flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">
-              Yearly Overview
+              {{ activeRankingScopeLabel }}
             </p>
             <h3 class="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
               Total Transaction Count & Total Amount
             </h3>
             <p class="mt-2 text-sm text-slate-500">
-              {{ userBankcode || "No bankcode" }} · {{ currentYear }}
+              {{ activeRankingScopeCaption }}
             </p>
+          </div>
+
+          <div class="flex flex-col items-start gap-3 lg:items-end">
+            <div class="inline-flex items-center rounded-full border border-slate-200 bg-white/90 p-1 shadow-sm">
+              <button
+                v-for="option in rankingScopeOptions"
+                :key="option.key"
+                type="button"
+                class="rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200"
+                :class="
+                  activeRankingScope === option.key
+                    ? 'bg-slate-900 text-white shadow-sm'
+                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                "
+                @click="handleRankingScopeChange(option.key)"
+              >
+                {{ option.label }}
+              </button>
+            </div>
+
+            <label
+              v-if="activeRankingScope === 'month'"
+              class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-3 py-2 text-xs font-medium text-slate-500 shadow-sm"
+            >
+              <span>Month</span>
+              <select
+                v-model="selectedRankingMonth"
+                class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700 outline-none"
+                @change="handleRankingMonthChange"
+              >
+                <option
+                  v-for="(label, index) in monthLabels"
+                  :key="label"
+                  :value="index + 1"
+                >
+                  {{ label }}
+                </option>
+              </select>
+            </label>
           </div>
         </div>
 
@@ -233,7 +272,7 @@
               ></path>
             </svg>
             <p class="font-medium text-slate-600">Loading total count & amount...</p>
-            <p class="mt-1 text-xs text-slate-400">Preparing monthly transfer chart</p>
+            <p class="mt-1 text-xs text-slate-400">{{ monthlyChartLoadingLabel }}</p>
           </div>
           <div
             v-else-if="!monthlyChartInitialized && monthlyChartError"
@@ -333,12 +372,13 @@ export default {
   },
 
   setup() {
-    const inquiryLoading = ref(true);
     const transferLoading = ref(true);
     const chartLoading = ref(true);
     const monthlyChartLoading = ref(true);
     const monthlyChartInitialized = ref(false);
     const monthlyChartError = ref("");
+    const activeRankingScope = ref("today");
+    const selectedRankingMonth = ref(new Date().getMonth() + 1);
     const totalMembers = ref(0);
     const totalInquiryTransaction = ref(0);
     const totalMerchantInactive = ref(0);
@@ -354,11 +394,11 @@ export default {
     const monthlyBarChartRef = ref(null);
     const currentYear = ref(new Date().getFullYear());
     const cachePrefix = "merchant-transaction-dashboard-v1";
+    const yearlyRankingTtlMs = 15 * 60 * 1000;
     const monthlyScopeTtlMs = 10 * 60 * 1000;
     const monthlyRealtimeRefreshMs = 30000;
-    const transferTodayTtlMs = 30 * 1000;
+    const rankingTodayTtlMs = 30 * 1000;
     const dailyCountsTtlMs = 2 * 60 * 1000;
-    const totalsTtlMs = 60 * 1000;
     const memberMerchantTtlMs = 5 * 60 * 1000;
 
     let dailyLineChart = null;
@@ -366,10 +406,13 @@ export default {
     let monthlyChartTween = null;
     let monthlyRealtimeTimer = null;
     let monthlyChartRequestId = 0;
-    let totalTransferTween = null;
     let monthlyChartRows = [];
     let monthlyChartHoverIndex = null;
     let lastTransferTodaySummary = null;
+    let monthlyChartContext = {
+      period: activeRankingScope.value,
+      month: selectedRankingMonth.value,
+    };
     let monthlyLegendSelected = {
       "Total Count": true,
       "Total Amount": true,
@@ -408,6 +451,157 @@ export default {
       "Oct",
       "Nov",
       "Dec",
+    ];
+    const rankingScopeOptions = [
+      { key: "today", label: "Today" },
+      { key: "month", label: "Month" },
+      { key: "year", label: "Year" },
+    ];
+    const rankingRowContainers = [
+      "data",
+      "results",
+      "items",
+      "rows",
+      "rankings",
+      "list",
+      "payload",
+    ];
+    const rankingBankcodePaths = [
+      ["bankcode"],
+      ["bankCode"],
+      ["memberBankCode"],
+      ["member_bank_code"],
+      ["bank_code"],
+      ["code"],
+      ["member", "bankcode"],
+      ["member", "bankCode"],
+      ["memberInfo", "bankcode"],
+      ["memberInfo", "bankCode"],
+    ];
+    const totalCountPaths = [
+      ["totalCount"],
+      ["total_count"],
+      ["count"],
+      ["todayCount"],
+      ["transactionCount"],
+      ["transferCount"],
+    ];
+    const totalAmountPaths = [
+      ["totalAmount"],
+      ["total_amount"],
+      ["amount"],
+      ["todayAmount"],
+      ["transactionAmount"],
+      ["transferAmount"],
+    ];
+    const fromCountPaths = [
+      ["fromCount"],
+      ["from_count"],
+      ["sentCount"],
+      ["sendCount"],
+      ["outCount"],
+      ["debitCount"],
+    ];
+    const toCountPaths = [
+      ["toCount"],
+      ["to_count"],
+      ["receivedCount"],
+      ["receiveCount"],
+      ["inCount"],
+      ["creditCount"],
+    ];
+    const fromAmountPaths = [
+      ["fromAmount"],
+      ["from_amount"],
+      ["sentAmount"],
+      ["sendAmount"],
+      ["outAmount"],
+      ["debitAmount"],
+    ];
+    const toAmountPaths = [
+      ["toAmount"],
+      ["to_amount"],
+      ["receivedAmount"],
+      ["receiveAmount"],
+      ["inAmount"],
+      ["creditAmount"],
+    ];
+    const genericRankPaths = [
+      ["rank"],
+      ["ranking"],
+      ["position"],
+      ["order"],
+      ["place"],
+      ["overallRank"],
+    ];
+    const rankFromCountPaths = [
+      ["rankFromCount"],
+      ["rank_from_count"],
+      ["fromCountRank"],
+      ["sentCountRank"],
+    ];
+    const rankToCountPaths = [
+      ["rankToCount"],
+      ["rank_to_count"],
+      ["toCountRank"],
+      ["receivedCountRank"],
+    ];
+    const rankTotalCountPaths = [
+      ["rankTotalCount"],
+      ["rank_total_count"],
+      ["totalCountRank"],
+      ["countRank"],
+    ];
+    const rankFromAmountPaths = [
+      ["rankFromAmount"],
+      ["rank_from_amount"],
+      ["fromAmountRank"],
+      ["sentAmountRank"],
+    ];
+    const rankToAmountPaths = [
+      ["rankToAmount"],
+      ["rank_to_amount"],
+      ["toAmountRank"],
+      ["receivedAmountRank"],
+    ];
+    const rankTotalAmountPaths = [
+      ["rankTotalAmount"],
+      ["rank_total_amount"],
+      ["totalAmountRank"],
+      ["amountRank"],
+    ];
+    const monthNumberPaths = [
+      ["month"],
+      ["monthNumber"],
+      ["month_number"],
+      ["monthNo"],
+      ["month_no"],
+      ["periodMonth"],
+    ];
+    const dayNumberPaths = [
+      ["day"],
+      ["dayOfMonth"],
+      ["day_of_month"],
+      ["dateDay"],
+      ["periodDay"],
+    ];
+    const hourNumberPaths = [
+      ["hour"],
+      ["hourOfDay"],
+      ["hour_of_day"],
+      ["periodHour"],
+    ];
+    const labelPaths = [
+      ["label"],
+      ["periodLabel"],
+      ["dayLabel"],
+      ["displayLabel"],
+      ["monthLabel"],
+      ["name"],
+      ["date"],
+      ["transactionDate"],
+      ["createdAt"],
+      ["timestamp"],
     ];
 
     const getAuthConfig = () => {
@@ -500,6 +694,68 @@ export default {
       return Number.isFinite(num) ? num : 0;
     };
 
+    const readPath = (source, path) =>
+      path.reduce(
+        (value, key) =>
+          value && typeof value === "object" && key in value ? value[key] : undefined,
+        source
+      );
+
+    const resolveFirstValue = (entry, paths = []) => {
+      for (const path of paths) {
+        const normalizedPath = Array.isArray(path) ? path : [path];
+        const value = readPath(entry, normalizedPath);
+
+        if (value !== undefined && value !== null && String(value).trim() !== "") {
+          return value;
+        }
+      }
+
+      return undefined;
+    };
+
+    const normalizeBankcode = (value) => {
+      const normalized = String(value || "").trim();
+      return normalized ? normalized.toUpperCase() : "";
+    };
+
+    const toPositiveInteger = (value) => {
+      const normalized = Math.floor(toSafeNumber(value));
+      return normalized > 0 ? normalized : 0;
+    };
+
+    const resolveEntryMetric = (entry, paths, fallback = 0) => {
+      const value = resolveFirstValue(entry, paths);
+      return value === undefined ? fallback : toSafeNumber(value);
+    };
+
+    const resolveEntryRank = (entry, index, paths, fallback = 0) => {
+      const value = toPositiveInteger(resolveFirstValue(entry, paths));
+      if (value > 0) return value;
+
+      const normalizedFallback = toPositiveInteger(fallback);
+      if (normalizedFallback > 0) return normalizedFallback;
+
+      return 0;
+    };
+
+    const parseEntryDateParts = (value) => {
+      if (!value) {
+        return { month: 0, day: 0, hour: 0 };
+      }
+
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        return { month: 0, day: 0, hour: 0 };
+      }
+
+      return {
+        month: parsed.getMonth() + 1,
+        day: parsed.getDate(),
+        hour: parsed.getHours(),
+      };
+    };
+
     const formatCount = (value) =>
       new Intl.NumberFormat("en-US", {
         maximumFractionDigits: 0,
@@ -517,6 +773,353 @@ export default {
         maximumFractionDigits: 1,
       }).format(toSafeNumber(value));
 
+    const formatRank = (value) => {
+      const normalized = toPositiveInteger(value);
+      return normalized > 0 ? `#${normalized}` : "-";
+    };
+
+    const activeRankingScopeLabel = computed(() => {
+      if (activeRankingScope.value === "year") return "Yearly Overview";
+      if (activeRankingScope.value === "month") return "Monthly Overview";
+      return "Today Overview";
+    });
+
+    const activeRankingScopeCaption = computed(() => {
+      const bankcode = userBankcode.value || "No bankcode";
+
+      if (activeRankingScope.value === "year") {
+        return `${bankcode} · ${currentYear.value}`;
+      }
+
+      if (activeRankingScope.value === "month") {
+        return `${bankcode} · ${monthLabels[selectedRankingMonth.value - 1]} ${currentYear.value}`;
+      }
+
+      return `${bankcode} · Today`;
+    });
+
+    const monthlyChartLoadingLabel = computed(() => {
+      if (activeRankingScope.value === "year") {
+        return "Preparing yearly transfer ranking chart";
+      }
+
+      if (activeRankingScope.value === "month") {
+        return `Preparing ${monthLabels[selectedRankingMonth.value - 1]} transfer ranking chart`;
+      }
+
+      return "Preparing today's transfer ranking chart";
+    });
+
+    const hasRankingShape = (payload) =>
+      Boolean(
+        payload &&
+          typeof payload === "object" &&
+          (resolveFirstValue(payload, rankingBankcodePaths) !== undefined ||
+            resolveFirstValue(payload, totalCountPaths) !== undefined ||
+            resolveFirstValue(payload, totalAmountPaths) !== undefined)
+      );
+
+    const extractRankingRows = (payload) => {
+      if (Array.isArray(payload)) {
+        return payload;
+      }
+
+      for (const key of rankingRowContainers) {
+        const container = payload?.[key];
+
+        if (Array.isArray(container)) {
+          return container;
+        }
+
+        if (container && typeof container === "object") {
+          for (const nestedKey of rankingRowContainers) {
+            if (Array.isArray(container[nestedKey])) {
+              return container[nestedKey];
+            }
+          }
+        }
+      }
+
+      return hasRankingShape(payload) ? [payload] : [];
+    };
+
+    const mergePositiveRank = (currentValue, nextValue) => {
+      const current = toPositiveInteger(currentValue);
+      const next = toPositiveInteger(nextValue);
+
+      if (!current) return next;
+      if (!next) return current;
+
+      return Math.min(current, next);
+    };
+
+    const buildFallbackScopeLabel = (context = monthlyChartContext) => {
+      if (context.period === "year") {
+        return String(currentYear.value);
+      }
+
+      if (context.period === "month") {
+        return monthLabels[(context.month || selectedRankingMonth.value) - 1] || "Month";
+      }
+
+      return "Today";
+    };
+
+    const createEmptyScopeRow = ({
+      label = "",
+      month = 0,
+      day = 0,
+      hour = 0,
+      sortOrder = 0,
+    } = {}) => ({
+      label,
+      rawLabel: "",
+      month,
+      day,
+      hour,
+      sortOrder,
+      bankCode: userBankcode.value || "",
+      bankName: userBankcode.value || "Member Bank",
+      fromCount: 0,
+      toCount: 0,
+      totalCount: 0,
+      fromAmount: 0,
+      toAmount: 0,
+      totalAmount: 0,
+      rankFromCount: 0,
+      rankToCount: 0,
+      rankTotalCount: 0,
+      rankFromAmount: 0,
+      rankToAmount: 0,
+      rankTotalAmount: 0,
+    });
+
+    const normalizeRankingEntry = (entry, index = 0) => {
+      const bankCode = normalizeBankcode(resolveFirstValue(entry, rankingBankcodePaths));
+      const rawDateValue = resolveFirstValue(entry, [
+        ["date"],
+        ["transactionDate"],
+        ["createdAt"],
+        ["timestamp"],
+      ]);
+      const parsedDateParts = parseEntryDateParts(rawDateValue);
+      const rawLabel = String(resolveFirstValue(entry, labelPaths) || "").trim();
+      const fromCount = resolveEntryMetric(entry, fromCountPaths);
+      const toCount = resolveEntryMetric(entry, toCountPaths);
+      const fromAmount = resolveEntryMetric(entry, fromAmountPaths);
+      const toAmount = resolveEntryMetric(entry, toAmountPaths);
+      const fallbackRank =
+        toPositiveInteger(resolveFirstValue(entry, genericRankPaths)) ||
+        toPositiveInteger(resolveFirstValue(entry, rankTotalCountPaths)) ||
+        toPositiveInteger(resolveFirstValue(entry, rankTotalAmountPaths));
+
+      return {
+        bankCode,
+        bankName: String(resolveFirstValue(entry, [["bankname"], ["bankName"], ["name"]]) || bankCode || "Member Bank").trim(),
+        rawLabel,
+        month:
+          toPositiveInteger(resolveFirstValue(entry, monthNumberPaths)) || parsedDateParts.month,
+        day: toPositiveInteger(resolveFirstValue(entry, dayNumberPaths)) || parsedDateParts.day,
+        hour:
+          toPositiveInteger(resolveFirstValue(entry, hourNumberPaths)) || parsedDateParts.hour,
+        sortOrder: index + 1,
+        fromCount,
+        toCount,
+        totalCount: resolveEntryMetric(entry, totalCountPaths, fromCount + toCount),
+        fromAmount,
+        toAmount,
+        totalAmount: resolveEntryMetric(entry, totalAmountPaths, fromAmount + toAmount),
+        rankFromCount: resolveEntryRank(entry, index, rankFromCountPaths, fallbackRank),
+        rankToCount: resolveEntryRank(entry, index, rankToCountPaths, fallbackRank),
+        rankTotalCount: resolveEntryRank(entry, index, rankTotalCountPaths, fallbackRank),
+        rankFromAmount: resolveEntryRank(entry, index, rankFromAmountPaths, fallbackRank),
+        rankToAmount: resolveEntryRank(entry, index, rankToAmountPaths, fallbackRank),
+        rankTotalAmount: resolveEntryRank(entry, index, rankTotalAmountPaths, fallbackRank),
+      };
+    };
+
+    const assignScopeRowLabel = (row, context, index = 0) => {
+      if (context.period === "year" && row.month >= 1 && row.month <= 12) {
+        return monthLabels[row.month - 1];
+      }
+
+      if (context.period === "month" && row.day > 0) {
+        return `Day ${row.day}`;
+      }
+
+      if (context.period === "today" && row.hour > 0) {
+        return `${String(row.hour).padStart(2, "0")}:00`;
+      }
+
+      if (row.rawLabel && row.rawLabel.length <= 32) {
+        return row.rawLabel;
+      }
+
+      if (context.period === "month") {
+        return monthLabels[(context.month || selectedRankingMonth.value) - 1] || "Month";
+      }
+
+      if (context.period === "year") {
+        return String(currentYear.value);
+      }
+
+      return index > 0 ? `Today ${index + 1}` : "Today";
+    };
+
+    const buildScopeSummary = (rows = []) =>
+      rows.reduce(
+        (summary, row) => ({
+          totalCount: summary.totalCount + toSafeNumber(row?.totalCount),
+          totalAmount: summary.totalAmount + toSafeNumber(row?.totalAmount),
+        }),
+        { totalCount: 0, totalAmount: 0 }
+      );
+
+    const mergeScopeRow = (baseRow, row) => ({
+      ...baseRow,
+      bankCode: row.bankCode || baseRow.bankCode,
+      bankName: row.bankName || baseRow.bankName,
+      rawLabel: row.rawLabel || baseRow.rawLabel,
+      month: row.month || baseRow.month,
+      day: row.day || baseRow.day,
+      hour: row.hour || baseRow.hour,
+      sortOrder: row.sortOrder || baseRow.sortOrder,
+      fromCount: toSafeNumber(baseRow.fromCount) + toSafeNumber(row.fromCount),
+      toCount: toSafeNumber(baseRow.toCount) + toSafeNumber(row.toCount),
+      totalCount: toSafeNumber(baseRow.totalCount) + toSafeNumber(row.totalCount),
+      fromAmount: toSafeNumber(baseRow.fromAmount) + toSafeNumber(row.fromAmount),
+      toAmount: toSafeNumber(baseRow.toAmount) + toSafeNumber(row.toAmount),
+      totalAmount: toSafeNumber(baseRow.totalAmount) + toSafeNumber(row.totalAmount),
+      rankFromCount: mergePositiveRank(baseRow.rankFromCount, row.rankFromCount),
+      rankToCount: mergePositiveRank(baseRow.rankToCount, row.rankToCount),
+      rankTotalCount: mergePositiveRank(baseRow.rankTotalCount, row.rankTotalCount),
+      rankFromAmount: mergePositiveRank(baseRow.rankFromAmount, row.rankFromAmount),
+      rankToAmount: mergePositiveRank(baseRow.rankToAmount, row.rankToAmount),
+      rankTotalAmount: mergePositiveRank(baseRow.rankTotalAmount, row.rankTotalAmount),
+    });
+
+    const buildScopeRowsFromNormalized = (rows = [], context = monthlyChartContext) => {
+      const normalizedRows = Array.isArray(rows) ? rows : [];
+
+      if (context.period === "year" && normalizedRows.some((row) => row.month > 0)) {
+        const baseRows = Array.from({ length: 12 }, (_, index) =>
+          createEmptyScopeRow({
+            label: monthLabels[index],
+            month: index + 1,
+            sortOrder: index + 1,
+          })
+        );
+
+        normalizedRows.forEach((row) => {
+          const monthIndex = row.month - 1;
+          if (monthIndex >= 0 && monthIndex < baseRows.length) {
+            baseRows[monthIndex] = mergeScopeRow(baseRows[monthIndex], row);
+            baseRows[monthIndex].label = monthLabels[monthIndex];
+          }
+        });
+
+        return baseRows;
+      }
+
+      if (context.period === "month" && normalizedRows.some((row) => row.day > 0)) {
+        const totalDays = new Date(
+          currentYear.value,
+          context.month || selectedRankingMonth.value,
+          0
+        ).getDate();
+        const baseRows = Array.from({ length: totalDays }, (_, index) =>
+          createEmptyScopeRow({
+            label: `Day ${index + 1}`,
+            month: context.month || selectedRankingMonth.value,
+            day: index + 1,
+            sortOrder: index + 1,
+          })
+        );
+
+        normalizedRows.forEach((row) => {
+          const dayIndex = row.day - 1;
+          if (dayIndex >= 0 && dayIndex < baseRows.length) {
+            baseRows[dayIndex] = mergeScopeRow(baseRows[dayIndex], row);
+            baseRows[dayIndex].label = `Day ${dayIndex + 1}`;
+          }
+        });
+
+        return baseRows;
+      }
+
+      if (context.period === "today" && normalizedRows.some((row) => row.hour > 0)) {
+        const hourMap = new Map();
+
+        normalizedRows.forEach((row, index) => {
+          const key = row.hour || index + 1;
+          const existing =
+            hourMap.get(key) ||
+            createEmptyScopeRow({
+              label: `${String(row.hour || key).padStart(2, "0")}:00`,
+              hour: row.hour || key,
+              sortOrder: row.hour || key,
+            });
+
+          hourMap.set(key, mergeScopeRow(existing, row));
+        });
+
+        return Array.from(hourMap.values()).sort((left, right) => left.sortOrder - right.sortOrder);
+      }
+
+      if (!normalizedRows.length) {
+        return [
+          createEmptyScopeRow({
+            label: buildFallbackScopeLabel(context),
+            month: context.month || 0,
+            sortOrder: 1,
+          }),
+        ];
+      }
+
+      if (normalizedRows.length === 1) {
+        const row = { ...normalizedRows[0] };
+        row.label = assignScopeRowLabel(row, context, 0);
+        row.sortOrder = row.sortOrder || 1;
+        return [row];
+      }
+
+      return normalizedRows
+        .map((row, index) => ({
+          ...row,
+          label: assignScopeRowLabel(row, context, index),
+          sortOrder:
+            context.period === "year"
+              ? row.month || index + 1
+              : context.period === "month"
+              ? row.day || index + 1
+              : row.hour || index + 1,
+        }))
+        .sort((left, right) => left.sortOrder - right.sortOrder);
+    };
+
+    const buildRankingScopeData = (payload, context = monthlyChartContext) => {
+      const normalizedBankcode = normalizeBankcode(context.bankcode || userBankcode.value);
+      const sourceRows = extractRankingRows(payload)
+        .map((entry, index) => normalizeRankingEntry(entry, index))
+        .filter((row) => !normalizedBankcode || row.bankCode === normalizedBankcode);
+      const rows = buildScopeRowsFromNormalized(sourceRows, context);
+
+      return {
+        rows,
+        sourceRows,
+        summary: buildScopeSummary(rows),
+      };
+    };
+
+    const getRankingScopeContext = (overrides = {}) => ({
+      period: overrides.period || activeRankingScope.value,
+      month:
+        overrides.month !== undefined
+          ? Number(overrides.month)
+          : Number(selectedRankingMonth.value),
+      bankcode: overrides.bankcode || userBankcode.value,
+    });
+
     const waitForChartPaint = () =>
       new Promise((resolve) => {
         if (typeof window === "undefined" || typeof window.requestAnimationFrame !== "function") {
@@ -527,51 +1130,24 @@ export default {
         window.requestAnimationFrame(() => resolve());
       });
 
-    const emptyMonthRow = (month) => ({
-      month,
-      fromCount: 0,
-      toCount: 0,
-      totalCount: 0,
-      fromAmount: 0,
-      toAmount: 0,
-      totalAmount: 0,
-    });
+    const normalizeMonthlyRows = (rows = [], context = monthlyChartContext) =>
+      buildScopeRowsFromNormalized(rows, context);
 
-    const normalizeMonthlyRows = (rows = []) => {
-      const base = Array.from({ length: 12 }, (_, i) => emptyMonthRow(i + 1));
-
-      rows.forEach((item) => {
-        const month = Number(item?.month);
-        if (month >= 1 && month <= 12) {
-          base[month - 1] = {
-            month,
-            fromCount: toSafeNumber(item?.fromCount),
-            toCount: toSafeNumber(item?.toCount),
-            totalCount: toSafeNumber(item?.totalCount),
-            fromAmount: toSafeNumber(item?.fromAmount),
-            toAmount: toSafeNumber(item?.toAmount),
-            totalAmount: toSafeNumber(item?.totalAmount),
-          };
-        }
-      });
-
-      return base;
-    };
-
-    const getMonthlyTotalCount = (rows = []) =>
-      normalizeMonthlyRows(rows).reduce(
-        (sum, item) => sum + toSafeNumber(item?.totalCount),
-        0
-      );
-
-    const interpolateMonthlyRows = (fromRows = [], toRows = [], progress = 1) => {
-      const startRows = normalizeMonthlyRows(fromRows);
-      const endRows = normalizeMonthlyRows(toRows);
+    const interpolateMonthlyRows = (fromRows = [], toRows = [], progress = 1, context = monthlyChartContext) => {
+      const startRows = normalizeMonthlyRows(fromRows, context);
+      const endRows = normalizeMonthlyRows(toRows, context);
 
       return endRows.map((row, index) => {
-        const start = startRows[index] || emptyMonthRow(index + 1);
-        return {
+        const start = startRows[index] || createEmptyScopeRow({
+          label: row.label,
           month: row.month,
+          day: row.day,
+          hour: row.hour,
+          sortOrder: row.sortOrder,
+        });
+
+        return {
+          ...row,
           fromCount: start.fromCount + (row.fromCount - start.fromCount) * progress,
           toCount: start.toCount + (row.toCount - start.toCount) * progress,
           totalCount: start.totalCount + (row.totalCount - start.totalCount) * progress,
@@ -584,95 +1160,113 @@ export default {
 
     const hasMonthlyChartRows = (rows) => Array.isArray(rows) && rows.length > 0;
 
-    const extractTransferRows = (payload) =>
-      Array.isArray(payload)
-        ? payload
-        : Array.isArray(payload?.data)
-        ? payload.data
-        : [];
+    const getRankingScopeCacheKey = (context = monthlyChartContext) =>
+      buildCacheKey(
+        "stacked-ranking-scope",
+        `${currentYear.value}:${context.period}:${context.month || "all"}:${context.bankcode || "unknown"}`
+      );
 
-    const extractTransferTodaySource = (payload) => {
-      if (typeof payload === "number") {
-        return { count: payload };
+    const getRankingScopeTtlMs = (period) =>
+      period === "today"
+        ? rankingTodayTtlMs
+        : period === "month"
+        ? monthlyScopeTtlMs
+        : yearlyRankingTtlMs;
+
+    const buildRankingScopeRequest = (context = monthlyChartContext) => {
+      if (context.period === "today") {
+        return {
+          url: `${apiUrl}/transfer/ranked-bankcodes-today`,
+          params: {},
+        };
       }
-
-      if (Array.isArray(payload)) {
-        return payload[0] || {};
-      }
-
-      if (Array.isArray(payload?.data)) {
-        return payload.data[0] || {};
-      }
-
-      if (payload?.data && typeof payload.data === "object") {
-        return payload.data;
-      }
-
-      return payload && typeof payload === "object" ? payload : {};
-    };
-
-    const extractTransferTodaySummary = (payload) => {
-      const item = extractTransferTodaySource(payload);
 
       return {
-        totalCount: toSafeNumber(
-          item?.totalCount ??
-            item?.count ??
-            item?.todayCount ??
-            item?.transactionCount ??
-            item?.transferCount
+        url: `${apiUrl}/transfer/ranked-bankcodes-by-year`,
+        params:
+          context.period === "month" && context.month
+            ? { month: context.month }
+            : {},
+      };
+    };
+
+    const fetchRankingScopeData = async (context = monthlyChartContext, forceRefresh = false) => {
+      const cacheKey = getRankingScopeCacheKey(context);
+
+      return fetchWithCache({
+        key: cacheKey,
+        ttlMs: getRankingScopeTtlMs(context.period),
+        forceRefresh,
+        requestFn: async () => {
+          const request = buildRankingScopeRequest(context);
+          const response = await axios.get(request.url, {
+            ...getAuthConfig(),
+            params: request.params,
+          });
+
+          return buildRankingScopeData(response.data, context);
+        },
+      });
+    };
+
+    const deriveMonthScopeFromYearCache = (context = monthlyChartContext) => {
+      if (context.period !== "month") return null;
+
+      const yearContext = getRankingScopeContext({
+        period: "year",
+        bankcode: context.bankcode,
+        month: 0,
+      });
+      const cachedYear = getCachedData(
+        getRankingScopeCacheKey(yearContext),
+        getRankingScopeTtlMs("year")
+      );
+      const yearSourceRows = Array.isArray(cachedYear.data?.sourceRows)
+        ? cachedYear.data.sourceRows
+        : [];
+
+      if (!yearSourceRows.length || !yearSourceRows.some((row) => row.month === context.month)) {
+        return null;
+      }
+
+      return {
+        rows: buildScopeRowsFromNormalized(
+          yearSourceRows.filter((row) => row.month === context.month),
+          context
         ),
-        totalAmount: toSafeNumber(
-          item?.totalAmount ??
-            item?.amount ??
-            item?.todayAmount ??
-            item?.transactionAmount ??
-            item?.transferAmount
+        sourceRows: yearSourceRows.filter((row) => row.month === context.month),
+        summary: buildScopeSummary(
+          buildScopeRowsFromNormalized(
+            yearSourceRows.filter((row) => row.month === context.month),
+            context
+          )
         ),
       };
     };
 
-    const getTransferMonthlyCacheKey = (bankcode) =>
-      buildCacheKey("monthly-transfer-scope", bankcode);
+    const primeYearRankingScopeCache = async () => {
+      try {
+        const context = getRankingScopeContext({ period: "year", month: 0 });
+        if (!context.bankcode) return;
 
-    const getTransferTodayCacheKey = (bankcode) =>
-      buildCacheKey("transfer-today-summary", bankcode);
-
-    const fetchTransferMonthlyRows = async (bankcode, forceRefresh = false) => {
-      const cacheKey = getTransferMonthlyCacheKey(bankcode);
-
-      return fetchWithCache({
-        key: cacheKey,
-        ttlMs: monthlyScopeTtlMs,
-        forceRefresh,
-        requestFn: async () => {
-          const response = await axios.get(
-            `${apiUrl}/transfer/count-by-bankcode/${encodeURIComponent(bankcode)}`,
-            getAuthConfig()
-          );
-
-          return extractTransferRows(response.data);
-        },
-      });
+        await fetchRankingScopeData(context, false);
+      } catch (error) {
+        console.error("Error priming year ranking scope cache:", error);
+      }
     };
 
-    const fetchTransferTodaySummary = async (bankcode, forceRefresh = false) => {
-      const cacheKey = getTransferTodayCacheKey(bankcode);
-
-      return fetchWithCache({
-        key: cacheKey,
-        ttlMs: transferTodayTtlMs,
-        forceRefresh,
-        requestFn: async () => {
-          const response = await axios.get(
-            `${apiUrl}/transfer/count-by-bankcode-today/${encodeURIComponent(bankcode)}`,
-            getAuthConfig()
-          );
-
-          return extractTransferTodaySummary(response.data);
-        },
-      });
+    const applyRankingScopeSummary = (scopeData = {}) => {
+      totalInquiryTransaction.value = Math.max(
+        0,
+        Math.round(toSafeNumber(scopeData?.summary?.totalCount))
+      );
+      totalTransferTransaction.value = toSafeNumber(scopeData?.summary?.totalAmount);
     };
+
+    const extractTransferTodaySummary = (scopeData) => ({
+      totalCount: toSafeNumber(scopeData?.summary?.totalCount),
+      totalAmount: toSafeNumber(scopeData?.summary?.totalAmount),
+    });
 
     const chartGradientCount = () =>
       new echarts.graphic.LinearGradient(0, 0, 0, 1, [
@@ -753,19 +1347,54 @@ export default {
         renderMonthlyBarChart(monthlyChartRows, null);
       });
     };
+    const buildTooltipRankingLines = (items = []) =>
+      items
+        .filter((item) => toPositiveInteger(item.value) > 0)
+        .map(
+          (item) => `
+            <div style="display:flex;justify-content:space-between;gap:12px;">
+              <span style="color:rgba(255,255,255,0.66);">${item.label}</span>
+              <b style="color:#FFFFFF;">${formatRank(item.value)}</b>
+            </div>
+          `
+        )
+        .join("");
+
+    const buildMonthlyChartTooltipTitle = (label, context = monthlyChartContext) => {
+      if (context.period === "year") {
+        return `${label} ${currentYear.value}`;
+      }
+
+      if (context.period === "month") {
+        return `${label} · ${monthLabels[(context.month || selectedRankingMonth.value) - 1]} ${currentYear.value}`;
+      }
+
+      return label;
+    };
 
     const renderMonthlyBarChart = (rawRows = [], hoveredIndex = null, options = {}) => {
       if (!monthlyBarChartRef.value) return;
 
-      const { persistRows = true } = options;
+      const { persistRows = true, context = monthlyChartContext } = options;
 
       if (persistRows) {
         monthlyChartRows = Array.isArray(rawRows) ? rawRows : [];
       }
+      monthlyChartContext = {
+        period: context.period || activeRankingScope.value,
+        month: context.month || selectedRankingMonth.value,
+      };
       monthlyChartHoverIndex = typeof hoveredIndex === "number" ? hoveredIndex : null;
 
       const rows = normalizeMonthlyRows(
-        persistRows ? monthlyChartRows : Array.isArray(rawRows) ? rawRows : []
+        persistRows ? monthlyChartRows : Array.isArray(rawRows) ? rawRows : [],
+        monthlyChartContext
+      );
+      const categoryLabels = rows.map(
+        (row, index) =>
+          row.label ||
+          assignScopeRowLabel(row, monthlyChartContext, index) ||
+          buildFallbackScopeLabel(monthlyChartContext)
       );
 
       if (!monthlyBarChart) {
@@ -837,15 +1466,30 @@ export default {
               }
 
               const index = visibleEntries?.[0]?.dataIndex ?? 0;
-              const item = rows[index] || emptyMonthRow(index + 1);
+              const item =
+                rows[index] ||
+                createEmptyScopeRow({
+                  label: categoryLabels[index] || buildFallbackScopeLabel(monthlyChartContext),
+                  sortOrder: index + 1,
+                });
               const showCount = isMonthlyLegendVisible("Total Count");
               const showAmount = isMonthlyLegendVisible("Total Amount");
+              const countRankLines = buildTooltipRankingLines([
+                { label: "rankFromCount", value: item.rankFromCount },
+                { label: "rankToCount", value: item.rankToCount },
+                { label: "rankTotalCount", value: item.rankTotalCount },
+              ]);
+              const amountRankLines = buildTooltipRankingLines([
+                { label: "rankFromAmount", value: item.rankFromAmount },
+                { label: "rankToAmount", value: item.rankToAmount },
+                { label: "rankTotalAmount", value: item.rankTotalAmount },
+              ]);
 
               return `
                 <div style="min-width: 320px; padding: 4px 2px;">
                   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
                     <div style="font-size:15px;font-weight:700;">
-                      ${monthLabels[index]} ${currentYear.value}
+                      ${buildMonthlyChartTooltipTitle(categoryLabels[index], monthlyChartContext)}
                     </div>
                   </div>
 
@@ -869,6 +1513,15 @@ export default {
                         <span style="color:#DBEAFE;">totalCount</span>
                         <b style="color:#FFFFFF;">${formatCount(item.totalCount)}</b>
                       </div>
+                      ${
+                        countRankLines
+                          ? `
+                      <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.10);display:grid;gap:6px;">
+                        ${countRankLines}
+                      </div>
+                      `
+                          : ""
+                      }
                     </div>
                     `
                         : ""
@@ -893,6 +1546,15 @@ export default {
                         <span style="color:#FEF3C7;">totalAmount</span>
                         <b style="color:#FFFFFF;">${formatAmount(item.totalAmount)}</b>
                       </div>
+                      ${
+                        amountRankLines
+                          ? `
+                      <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.10);display:grid;gap:6px;">
+                        ${amountRankLines}
+                      </div>
+                      `
+                          : ""
+                      }
                     </div>
                     `
                         : ""
@@ -904,13 +1566,14 @@ export default {
           },
           xAxis: {
             type: "category",
-            data: monthLabels,
+            data: categoryLabels,
             axisLine: {
               lineStyle: { color: "#CBD5E1" },
             },
             axisTick: { show: false },
             axisLabel: {
               color: "#64748B",
+              rotate: categoryLabels.length > 10 ? 32 : 0,
             },
             axisPointer: {
               type: "shadow",
@@ -990,19 +1653,22 @@ export default {
       );
     };
 
-    const animateMonthlyChartRows = (nextRows = []) => {
-      const normalizedNextRows = normalizeMonthlyRows(nextRows);
+    const animateMonthlyChartRows = (nextRows = [], context = monthlyChartContext) => {
+      const normalizedNextRows = normalizeMonthlyRows(nextRows, context);
       const hasPreviousRows = hasMonthlyChartRows(monthlyChartRows);
+      const isSameScope =
+        monthlyChartContext.period === context.period &&
+        Number(monthlyChartContext.month || 0) === Number(context.month || 0);
 
-      if (!monthlyChartInitialized.value || !hasPreviousRows) {
-        renderMonthlyBarChart(normalizedNextRows, monthlyChartHoverIndex);
+      if (!monthlyChartInitialized.value || !hasPreviousRows || !isSameScope) {
+        renderMonthlyBarChart(normalizedNextRows, monthlyChartHoverIndex, { context });
         return;
       }
 
       monthlyChartTween?.kill();
 
       const tweenState = { progress: 0 };
-      const fromRows = normalizeMonthlyRows(monthlyChartRows);
+      const fromRows = normalizeMonthlyRows(monthlyChartRows, context);
 
       monthlyChartTween = gsap.to(tweenState, {
         progress: 1,
@@ -1010,41 +1676,14 @@ export default {
         ease: "power2.out",
         onUpdate: () => {
           renderMonthlyBarChart(
-            interpolateMonthlyRows(fromRows, normalizedNextRows, tweenState.progress),
+            interpolateMonthlyRows(fromRows, normalizedNextRows, tweenState.progress, context),
             monthlyChartHoverIndex,
-            { persistRows: false }
+            { persistRows: false, context }
           );
         },
         onComplete: () => {
-          renderMonthlyBarChart(normalizedNextRows, monthlyChartHoverIndex);
+          renderMonthlyBarChart(normalizedNextRows, monthlyChartHoverIndex, { context });
           monthlyChartTween = null;
-        },
-      });
-    };
-
-    const setAnimatedTotalTransferCount = (nextValue, animate = true) => {
-      const normalizedValue = Math.max(0, Math.round(toSafeNumber(nextValue)));
-
-      totalTransferTween?.kill();
-
-      if (!animate) {
-        totalTransferTransaction.value = normalizedValue;
-        totalTransferTween = null;
-        return;
-      }
-
-      const tweenState = { value: toSafeNumber(totalTransferTransaction.value) };
-
-      totalTransferTween = gsap.to(tweenState, {
-        value: normalizedValue,
-        duration: 1.1,
-        ease: "power2.out",
-        onUpdate: () => {
-          totalTransferTransaction.value = Math.round(tweenState.value);
-        },
-        onComplete: () => {
-          totalTransferTransaction.value = normalizedValue;
-          totalTransferTween = null;
         },
       });
     };
@@ -1182,8 +1821,6 @@ export default {
       clearMonthlyRealtimeRefresh();
       monthlyChartTween?.kill();
       monthlyChartTween = null;
-      totalTransferTween?.kill();
-      totalTransferTween = null;
       window.removeEventListener("resize", resizeCharts);
       dailyLineChart?.dispose();
       dailyLineChart = null;
@@ -1192,25 +1829,35 @@ export default {
     };
 
     const fetchMonthlyTransferScope = async (options = {}) => {
-      const { forceRefresh = false, showLoading = true, animate = false } = options;
+      const {
+        forceRefresh = false,
+        showLoading = true,
+        animate = false,
+        period = activeRankingScope.value,
+        month = selectedRankingMonth.value,
+      } = options;
       const requestId = ++monthlyChartRequestId;
       monthlyChartError.value = "";
       let hasRenderedCachedData = false;
       try {
-        const bankcode = userBankcode.value;
-        if (!bankcode) {
+        const context = getRankingScopeContext({ period, month });
+        if (!context.bankcode) {
           monthlyChartError.value = "No bankcode found for this account.";
           return;
         }
 
-        const cacheKey = getTransferMonthlyCacheKey(bankcode);
-        const cached = getCachedData(cacheKey, monthlyScopeTtlMs);
-        const hasUsableCachedRows = hasMonthlyChartRows(cached.data);
+        const cacheKey = getRankingScopeCacheKey(context);
+        const cached = getCachedData(cacheKey, getRankingScopeTtlMs(context.period));
+        const derivedScopeData = !cached.data ? deriveMonthScopeFromYearCache(context) : null;
+        const previewScopeData = cached.data || derivedScopeData;
 
-        if (hasUsableCachedRows) {
+        transferLoading.value = !hasMonthlyChartRows(previewScopeData?.rows);
+
+        if (hasMonthlyChartRows(previewScopeData?.rows)) {
+          applyRankingScopeSummary(previewScopeData);
           await nextTick();
           if (requestId !== monthlyChartRequestId) return;
-          renderMonthlyBarChart(cached.data);
+          renderMonthlyBarChart(previewScopeData.rows, null, { context });
           monthlyChartInitialized.value = true;
           hasRenderedCachedData = true;
           monthlyChartLoading.value = false;
@@ -1218,22 +1865,27 @@ export default {
           monthlyChartLoading.value = true;
         }
 
-        const rows = await fetchTransferMonthlyRows(
-          bankcode,
-          forceRefresh || !cached.isFresh || !hasUsableCachedRows
+        const scopeData = await fetchRankingScopeData(
+          context,
+          forceRefresh || !cached.isFresh || !cached.data
         );
 
         await nextTick();
         if (requestId !== monthlyChartRequestId) return;
-        const rowsToRender = normalizeMonthlyRows(rows);
+        applyRankingScopeSummary(scopeData);
+        const rowsToRender = normalizeMonthlyRows(scopeData.rows, context);
 
         if (animate) {
-          animateMonthlyChartRows(rowsToRender);
+          animateMonthlyChartRows(rowsToRender, context);
         } else {
-          renderMonthlyBarChart(rowsToRender);
+          renderMonthlyBarChart(rowsToRender, null, { context });
         }
         monthlyChartError.value = "";
         monthlyChartInitialized.value = true;
+        monthlyChartContext = context;
+        if (context.period === "today") {
+          lastTransferTodaySummary = extractTransferTodaySummary(scopeData);
+        }
         await waitForChartPaint();
         if (requestId !== monthlyChartRequestId) return;
         monthlyChartLoading.value = false;
@@ -1241,12 +1893,15 @@ export default {
         if (requestId !== monthlyChartRequestId) return;
         if (!hasRenderedCachedData) {
           monthlyChartError.value =
-            error.response?.data?.message || "Unable to load monthly transfer data.";
+            error.response?.data?.message || "Unable to load transfer ranking data.";
           monthlyChartInitialized.value = false;
         }
       } finally {
         if (requestId === monthlyChartRequestId && !monthlyChartInitialized.value) {
           monthlyChartLoading.value = false;
+        }
+        if (requestId === monthlyChartRequestId) {
+          transferLoading.value = false;
         }
       }
     };
@@ -1329,62 +1984,27 @@ export default {
       }
     };
 
-    const fetchTotalInquiryTransaction = async () => {
-      inquiryLoading.value = true;
-      try {
-        const bankcode = userBankcode.value;
-        if (!bankcode) return;
-
-        const cacheKey = buildCacheKey("inquiry-count-today", bankcode);
-        const cached = getCachedData(cacheKey, totalsTtlMs);
-        if (cached.data !== null && cached.data !== undefined) {
-          totalInquiryTransaction.value = Number(cached.data) || 0;
-          inquiryLoading.value = false;
-        }
-
-        const count = await fetchWithCache({
-          key: cacheKey,
-          ttlMs: totalsTtlMs,
-          forceRefresh: !cached.isFresh,
-          requestFn: async () => {
-            const response = await axios.get(`${apiUrl}/inquiry/count-today`, {
-              ...getAuthConfig(),
-              params: { bankcode },
-            });
-            return Number(response.data?.count) || 0;
-          },
-        });
-
-        totalInquiryTransaction.value = Number(count) || 0;
-      } catch (error) {
-        console.error("Error fetching inquiry today:", error);
-        totalInquiryTransaction.value = 0;
-      } finally {
-        inquiryLoading.value = false;
-      }
-    };
-
     const primeTransferTodaySummary = async () => {
       try {
-        const bankcode = userBankcode.value;
-        if (!bankcode) return null;
+        const context = getRankingScopeContext({ period: "today" });
+        if (!context.bankcode) return null;
 
         const cached = getCachedData(
-          getTransferTodayCacheKey(bankcode),
-          transferTodayTtlMs
+          getRankingScopeCacheKey(context),
+          getRankingScopeTtlMs("today")
         );
 
         if (cached.data) {
-          lastTransferTodaySummary = cached.data;
+          lastTransferTodaySummary = extractTransferTodaySummary(cached.data);
         }
 
         if (cached.isFresh && cached.data) {
-          return cached.data;
+          return cached.data.summary;
         }
 
-        const summary = await fetchTransferTodaySummary(bankcode, !cached.isFresh);
-        lastTransferTodaySummary = summary;
-        return summary;
+        const scopeData = await fetchRankingScopeData(context, !cached.isFresh);
+        lastTransferTodaySummary = extractTransferTodaySummary(scopeData);
+        return scopeData.summary;
       } catch (error) {
         console.error("Error priming transfer today summary:", error);
         return null;
@@ -1399,12 +2019,26 @@ export default {
         if (!bankcode) return;
 
         const previousTodaySummary = lastTransferTodaySummary;
-        const nextTodaySummary = await fetchTransferTodaySummary(bankcode, true);
+        const todayContext = getRankingScopeContext({ period: "today" });
+        const todayScopeData = await fetchRankingScopeData(todayContext, true);
+        const nextTodaySummary = extractTransferTodaySummary(todayScopeData);
         const shouldRefreshYear =
           !monthlyChartInitialized.value ||
           !previousTodaySummary ||
           nextTodaySummary.totalCount !== previousTodaySummary.totalCount ||
           nextTodaySummary.totalAmount !== previousTodaySummary.totalAmount;
+
+        if (activeRankingScope.value === "today") {
+          applyRankingScopeSummary(todayScopeData);
+          if (animate) {
+            animateMonthlyChartRows(todayScopeData.rows, todayContext);
+          } else {
+            renderMonthlyBarChart(todayScopeData.rows, null, { context: todayContext });
+          }
+          monthlyChartInitialized.value = true;
+          lastTransferTodaySummary = nextTodaySummary;
+          return;
+        }
 
         if (!shouldRefreshYear) {
           lastTransferTodaySummary = nextTodaySummary;
@@ -1438,21 +2072,26 @@ export default {
       scheduleMonthlyRealtimeRefresh();
     };
 
-    const fetchTotalTransferTransaction = async () => {
-      transferLoading.value = true;
-      try {
-        const bankcode = localStorage.getItem("bankcode");
-        if (!bankcode) return;
-        const response = await axios.get(`${apiUrl}/transfer/count-today`, {
-          params: { bankcode },
-        });
-        setAnimatedTotalTransferCount(Number(response.data?.count) || 0, false);
-      } catch (error) {
-        console.error("Error fetching transfer today:", error);
-        totalTransferTransaction.value = 0;
-      } finally {
-        transferLoading.value = false;
-      }
+    const handleRankingScopeChange = async (period) => {
+      if (!period || activeRankingScope.value === period) return;
+
+      activeRankingScope.value = period;
+      await fetchMonthlyTransferScope({
+        showLoading: true,
+        animate: true,
+        period,
+      });
+    };
+
+    const handleRankingMonthChange = async () => {
+      if (activeRankingScope.value !== "month") return;
+
+      await fetchMonthlyTransferScope({
+        showLoading: true,
+        animate: true,
+        period: "month",
+        month: selectedRankingMonth.value,
+      });
     };
 
     const fetchTotalMembers = async () => {
@@ -1614,11 +2253,12 @@ export default {
 
       fetchTotalMembers();
       fetchTotalMerchantInactive();
-      fetchTotalInquiryTransaction();
-      fetchTotalTransferTransaction();
       fetchMemberMerchants();
       fetchDailyCounts();
-      fetchMonthlyTransferScope();
+      fetchMonthlyTransferScope({
+        period: "today",
+      });
+      primeYearRankingScopeCache();
       primeTransferTodaySummary();
 
       animateChartCards();
@@ -1651,6 +2291,17 @@ export default {
       monthlyChartError,
       monthlyBarChartRef,
       currentYear,
+      monthLabels,
+      rankingScopeOptions,
+      activeRankingScope,
+      selectedRankingMonth,
+      activeRankingScopeLabel,
+      activeRankingScopeCaption,
+      monthlyChartLoadingLabel,
+      handleRankingScopeChange,
+      handleRankingMonthChange,
+      formatCount,
+      formatAmount,
     };
   },
 };

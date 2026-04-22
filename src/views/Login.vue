@@ -59,12 +59,13 @@
         <div>
           <button
             type="submit"
+            :disabled="isSubmitting"
             class="group relative w-full flex justify-center py-4 px-6 border border-transparent
               font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500
-              focus:outline-none focus:ring-2 focus:ring-offset-2
+              focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed
               transition"
           >
-            Sign in
+            {{ isSubmitting ? "Preparing dashboard..." : "Sign in" }}
           </button>
         </div>
       </form>
@@ -76,7 +77,9 @@
 import axios from "axios";
 import {
   clearQueuedMemberRankingOverlay,
+  fetchMemberRankingOverlayState,
   queueMemberRankingOverlay,
+  writeTransactionTodayRankingCardCache,
   writeStoredAuthUserProfile,
 } from "@/utils/memberRankingOverlay";
 
@@ -87,6 +90,7 @@ export default {
       password: "",
       errorMsg: "",
       readonly: true,
+      isSubmitting: false,
     };
   },
   mounted() {
@@ -107,7 +111,10 @@ export default {
   },
   methods: {
     async handleSubmit() {
+      if (this.isSubmitting) return;
+
       try {
+        this.isSubmitting = true;
         this.errorMsg = "";
         const apiUrl = import.meta.env.VITE_API_URL;
         if (!apiUrl) {
@@ -141,9 +148,17 @@ export default {
         writeStoredAuthUserProfile(response.data);
 
         if (normalizedRole === "user") {
+          const overlayState = await fetchMemberRankingOverlayState({
+            apiUrl,
+            token: access_token,
+            authProfile: response.data,
+          });
+
+          writeTransactionTodayRankingCardCache(bankcode || "", overlayState);
           queueMemberRankingOverlay({
             role: normalizedRole,
             bankcode: bankcode || "",
+            overlayState,
           });
           this.$router.push({ name: "transaction" });
         } else {
@@ -153,6 +168,8 @@ export default {
       } catch (error) {
         this.errorMsg = error.response?.data?.message || "Login failed";
         console.error("Login error:", error);
+      } finally {
+        this.isSubmitting = false;
       }
     },
   },

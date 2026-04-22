@@ -14,6 +14,7 @@
 
     <member-ranking-overlay
       :is-open="isMemberRankingOverlayOpen"
+      :prefetched-state="memberRankingOverlayState"
       @close="closeMemberRankingOverlay"
     />
   </div>
@@ -42,6 +43,7 @@ export default {
   setup() {
     const route = useRoute()
     const isMemberRankingOverlayOpen = ref(false)
+    const memberRankingOverlayState = ref(null)
 
     const maybeOpenMemberRankingOverlay = () => {
       const role = normalizeRole(localStorage.getItem('role'))
@@ -61,12 +63,14 @@ export default {
         return
       }
 
+      memberRankingOverlayState.value = pendingOverlay.overlayState || null
       clearQueuedMemberRankingOverlay()
       isMemberRankingOverlayOpen.value = true
     }
 
     const closeMemberRankingOverlay = () => {
       isMemberRankingOverlayOpen.value = false
+      memberRankingOverlayState.value = null
       clearQueuedMemberRankingOverlay()
     }
 
@@ -81,6 +85,7 @@ export default {
     return {
       closeMemberRankingOverlay,
       isMemberRankingOverlayOpen,
+      memberRankingOverlayState,
     }
   },
 }
