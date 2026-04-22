@@ -74,6 +74,11 @@
 
 <script>
 import axios from "axios";
+import {
+  clearQueuedMemberRankingOverlay,
+  queueMemberRankingOverlay,
+  writeStoredAuthUserProfile,
+} from "@/utils/memberRankingOverlay";
 
 export default {
   data() {
@@ -133,10 +138,16 @@ export default {
         localStorage.setItem("iin", response.data.iin || "");
         localStorage.setItem("tokenExpiry", expiryTime);
         localStorage.setItem("memberId", memberId || "");
+        writeStoredAuthUserProfile(response.data);
 
         if (normalizedRole === "user") {
+          queueMemberRankingOverlay({
+            role: normalizedRole,
+            bankcode: bankcode || "",
+          });
           this.$router.push({ name: "transaction" });
         } else {
+          clearQueuedMemberRankingOverlay();
           this.$router.push({ name: "dashboard" });
         }
       } catch (error) {

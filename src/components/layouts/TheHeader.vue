@@ -70,6 +70,10 @@
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
 import { useRouter } from 'vue-router';
 import { computed } from 'vue';
+import {
+  clearQueuedMemberRankingOverlay,
+  clearStoredAuthUserProfile,
+} from '@/utils/memberRankingOverlay';
 
 export default {
   components: {
@@ -88,6 +92,11 @@ export default {
       localStorage.removeItem('role');
       localStorage.removeItem('bankcode');
       localStorage.removeItem('username');
+      localStorage.removeItem('iin');
+      localStorage.removeItem('memberId');
+      localStorage.removeItem('tokenExpiry');
+      clearStoredAuthUserProfile();
+      clearQueuedMemberRankingOverlay();
       router.push({ name: 'login' });
     };
 
